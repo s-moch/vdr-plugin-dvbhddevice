@@ -318,10 +318,10 @@ void cDvbHdFfDevice::SetDigitalAudioDevice(bool On)
 
 void cDvbHdFfDevice::SetAudioTrackDevice(eTrackType Type)
 {
+  printf("SetAudioTrackDevice %d\n", Type);
   const tTrackId *TrackId = GetTrack(Type);
   if (TrackId && TrackId->id) {
-     //SetAudioBypass(false);
-     if (IS_AUDIO_TRACK(Type) || (IS_DOLBY_TRACK(Type)/*TODO && SetAudioBypass(true)TODO*/)) {
+     if (IS_AUDIO_TRACK(Type)) {
         if (pidHandles[ptAudio].pid && pidHandles[ptAudio].pid != TrackId->id) {
            DetachAll(pidHandles[ptAudio].pid);
            if (CamSlot())
@@ -333,17 +333,11 @@ void cDvbHdFfDevice::SetAudioTrackDevice(eTrackType Type)
               CamSlot()->StartDecrypting();
               }
            }
-        }
+	}
      else if (IS_DOLBY_TRACK(Type)) {
-       if (setTransferModeForDolbyDigital == 0) {
-          pidHandles[ptDolby].pid = TrackId->id;
-          SetPid(&pidHandles[ptDolby], ptDolby, true);
-          }
-       else {
-          // Currently this works only in Transfer Mode
-          ForceTransferMode();
-          }
-       }
+        pidHandles[ptDolby].pid = TrackId->id;
+        SetPid(&pidHandles[ptDolby], ptDolby, true);
+        }
      }
 }
 
