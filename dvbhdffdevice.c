@@ -153,9 +153,6 @@ bool cDvbHdFfDevice::SetAudioBypass(bool On)
 }
 TODO*/
 
-//                                   ptAudio        ptVideo        ptPcr        ptTeletext        ptDolby        ptOther
-static dmx_pes_type_t PesTypes[] = { DMX_PES_AUDIO, DMX_PES_VIDEO, DMX_PES_PCR, DMX_PES_TELETEXT, DMX_PES_OTHER, DMX_PES_OTHER };
-
 bool cDvbHdFfDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 {
   if (Handle->pid) {
@@ -409,14 +406,10 @@ int64_t cDvbHdFfDevice::GetSTC(void)
 void cDvbHdFfDevice::TrickSpeed(int Speed)
 {
   mHdffCmdIf->CmdAvEnableSync(0, false);
-  // as we are getting I-Frames only we have to lower the speed
-  //TODO there are not only I-frames in trick speed modes - e.g. in "slow motion"!
-  if (Speed > 5)
-     mHdffCmdIf->CmdAvSetSpeed(0, 25);
-  else if (Speed > 2)
-     mHdffCmdIf->CmdAvSetSpeed(0, 50);
-  else
-     mHdffCmdIf->CmdAvSetSpeed(0, 100);
+  mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF::audioStreamMpeg1);
+  playAudioPid = -1;
+  if (Speed > 0)
+     mHdffCmdIf->CmdAvSetVideoSpeed(0, 100 / Speed);
 }
 
 void cDvbHdFfDevice::Clear(void)
@@ -430,13 +423,15 @@ void cDvbHdFfDevice::Clear(void)
 void cDvbHdFfDevice::Play(void)
 {
   mHdffCmdIf->CmdAvEnableSync(0, true);
-  mHdffCmdIf->CmdAvSetSpeed(0, 100);
+  mHdffCmdIf->CmdAvSetVideoSpeed(0, 100);
+  mHdffCmdIf->CmdAvSetAudioSpeed(0, 100);
   cDevice::Play();
 }
 
 void cDvbHdFfDevice::Freeze(void)
 {
-  mHdffCmdIf->CmdAvSetSpeed(0, 0);
+  mHdffCmdIf->CmdAvSetVideoSpeed(0, 0);
+  mHdffCmdIf->CmdAvSetAudioSpeed(0, 0);
   cDevice::Freeze();
 }
 
