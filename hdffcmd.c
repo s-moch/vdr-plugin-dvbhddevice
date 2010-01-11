@@ -152,7 +152,7 @@ void cHdffCmdIf::CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVide
 
 void cHdffCmdIf::CmdAvSetAudioPid(uint8_t DecoderIndex, uint16_t AudioPid, eAudioStreamType StreamType)
 {
-    printf("SetAudioPid %d\n", AudioPid);
+    printf("SetAudioPid %d %d\n", AudioPid, StreamType);
     cBitBuffer cmdBuf(MAX_CMD_LEN);
     osd_raw_cmd_t osd_cmd;
 
@@ -380,14 +380,29 @@ void cHdffCmdIf::CmdAvEnableSync(uint8_t DecoderIndex, bool EnableSync)
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }
 
-void cHdffCmdIf::CmdAvSetSpeed(uint8_t DecoderIndex, int32_t Speed)
+void cHdffCmdIf::CmdAvSetVideoSpeed(uint8_t DecoderIndex, int32_t Speed)
 {
     cBitBuffer cmdBuf(MAX_CMD_LEN);
     osd_raw_cmd_t osd_cmd;
 
     memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
     osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetSpeed);
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetVideoSpeed);
+    cmdBuf.SetBits(4, DecoderIndex);
+    cmdBuf.SetBits(4, 0);
+    cmdBuf.SetBits(32, Speed);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
+void cHdffCmdIf::CmdAvSetAudioSpeed(uint8_t DecoderIndex, int32_t Speed)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetAudioSpeed);
     cmdBuf.SetBits(4, DecoderIndex);
     cmdBuf.SetBits(4, 0);
     cmdBuf.SetBits(32, Speed);

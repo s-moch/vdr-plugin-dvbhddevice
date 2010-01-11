@@ -52,8 +52,10 @@ typedef enum _eMessageId
     msgAvSetStc,
     msgAvFlushBuffer,
     msgAvEnableSync,
-    msgAvSetSpeed,
+    msgAvSetVideoSpeed,
+    msgAvSetAudioSpeed,
     msgAvEnableVideoAfterStop,
+    msgAvGetVideoFormatInfo,
 
     msgMuxSetVideoOut = 0,
     msgMuxSetSlowBlank,

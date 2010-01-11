@@ -44,7 +44,8 @@ public:
     void CmdAvSetStc(uint8_t DecoderIndex, uint64_t Stc);
     void CmdAvFlushBuffer(uint8_t DecoderIndex, bool FlushAudio, bool FlushVideo);
     void CmdAvEnableSync(uint8_t DecoderIndex, bool EnableSync);
-    void CmdAvSetSpeed(uint8_t DecoderIndex, int32_t Speed);
+    void CmdAvSetVideoSpeed(uint8_t DecoderIndex, int32_t Speed);
+    void CmdAvSetAudioSpeed(uint8_t DecoderIndex, int32_t Speed);
     void CmdAvEnableVideoAfterStop(uint8_t DecoderIndex, bool EnableVideoAfterStop);
 
     uint32_t CmdOsdCreateDisplay(uint32_t Width, uint32_t Height, eColorType ColorType);
