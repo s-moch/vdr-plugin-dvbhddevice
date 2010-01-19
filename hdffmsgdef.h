@@ -75,6 +75,7 @@ typedef enum _eMessageId
     msgOsdCreatePalette = 30,
     msgOsdDeletePalette,
     msgOsdSetDisplayPalette,
+    msgOsdSetPaletteColors,
     msgOsdCreateFontFace = 50,
     msgOsdDeleteFontFace,
     msgOsdCreateFont,
@@ -207,6 +208,12 @@ typedef enum _eColorType
     colorTypeARGB4444,
     colorTypeARGB1555,
 } eColorType;
+
+typedef enum _eColorFormat
+{
+    colorFormatARGB,
+    colorFormatACbYCr,
+} eColorFormat;
 
 typedef enum _eDrawingFlags
 {

@@ -55,6 +55,11 @@ public:
     void CmdOsdSetDisplayClippingArea(uint32_t hDisplay, bool Enable, uint32_t X, uint32_t Y, uint32_t Width, uint32_t Height);
     void CmdOsdRenderDisplay(uint32_t hDisplay);
 
+    uint32_t CmdOsdCreatePalette(eColorType ColorType, eColorFormat ColorFormat, uint32_t NumColors, uint32_t * pColors);
+    void CmdOsdDeletePalette(uint32_t hPalette);
+    void CmdOsdSetDisplayPalette(uint32_t hDisplay, uint32_t hPalette);
+    void CmdOsdSetPaletteColors(uint32_t hPalette, eColorFormat ColorFormat, uint8_t StartColor, uint32_t NumColors, uint32_t * pColors);
+
     uint32_t CmdOsdCreateFontFace(uint8_t * pFontData, uint32_t DataSize);
     void CmdOsdDeleteFontFace(uint32_t hFontFace);
     uint32_t CmdOsdCreateFont(uint32_t hFontFace, uint32_t Size);

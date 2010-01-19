@@ -553,6 +553,89 @@ void cHdffCmdIf::CmdOsdRenderDisplay(uint32_t hDisplay)
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }
 
+uint32_t cHdffCmdIf::CmdOsdCreatePalette(eColorType ColorType,
+        eColorFormat ColorFormat, uint32_t NumColors, uint32_t * pColors)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    cBitBuffer resBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+    uint32_t i;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    osd_cmd.result_data = resBuf.GetData();
+    osd_cmd.result_len = resBuf.GetMaxLength();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupOsd, msgOsdCreatePalette);
+    cmdBuf.SetBits(8, ColorType);
+    cmdBuf.SetBits(8, ColorFormat);
+    if (NumColors > 256)
+        NumColors = 256;
+    cmdBuf.SetBits(8, NumColors == 256 ? 0 : NumColors);
+    for (i = 0; i < NumColors; i++)
+    {
+        cmdBuf.SetBits(32, pColors[i]);
+    }
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    if (osd_cmd.result_len > 0)
+    {
+        uint8_t * result = resBuf.GetData();
+        return (result[6] << 24) | (result[7] << 16) | (result[8] << 8) | result[9];
+    }
+    return InvalidHandle;
+}
+
+void cHdffCmdIf::CmdOsdDeletePalette(uint32_t hPalette)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupOsd, msgOsdDeletePalette);
+    cmdBuf.SetBits(32, hPalette);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
+void cHdffCmdIf::CmdOsdSetDisplayPalette(uint32_t hDisplay, uint32_t hPalette)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupOsd, msgOsdSetDisplayPalette);
+    cmdBuf.SetBits(32, hDisplay);
+    cmdBuf.SetBits(32, hPalette);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
+void cHdffCmdIf::CmdOsdSetPaletteColors(uint32_t hPalette, eColorFormat ColorFormat,
+        uint8_t StartColor, uint32_t NumColors, uint32_t * pColors)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+    uint32_t i;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupOsd, msgOsdSetPaletteColors);
+    cmdBuf.SetBits(32, hPalette);
+    cmdBuf.SetBits(8, ColorFormat);
+    cmdBuf.SetBits(8, StartColor);
+    if (NumColors > 256)
+        NumColors = 256;
+    cmdBuf.SetBits(8, NumColors == 256 ? 0 : NumColors);
+    for (i = 0; i < NumColors; i++)
+    {
+        cmdBuf.SetBits(32, pColors[i]);
+    }
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
 uint32_t cHdffCmdIf::CmdOsdCreateFontFace(uint8_t * pFontData, uint32_t DataSize)
 {
     //printf("CreateFontFace %d\n", DataSize);
