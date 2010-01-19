@@ -42,6 +42,9 @@ private:
     uint32_t mDisplay;
     tFontFace mFontFaces[MAX_NUM_FONTFACES];
     tFont mFonts[MAX_NUM_FONTS];
+    uint32_t mBitmapPalette;
+    uint32_t mBitmapColors[256];
+    uint32_t mBitmapNumColors;
 
 protected:
     virtual void SetActive(bool On);
@@ -73,6 +76,7 @@ cHdffOsd::cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level)
     shown = false;
     mChanged = false;
     mBitmapModified = false;
+    mBitmapPalette = InvalidHandle;
     gHdffSetup.GetOsdSize(mDispWidth, mDispHeight, pixelAspect);
     mDisplay = mHdffCmdIf->CmdOsdCreateDisplay(mDispWidth, mDispHeight, HDFF::colorTypeARGB8888);
     mHdffCmdIf->CmdOsdSetDisplayOutputRectangle(mDisplay, 0, 0, SizeFullScreen, SizeFullScreen);
@@ -107,6 +111,8 @@ cHdffOsd::~cHdffOsd()
         mHdffCmdIf->CmdOsdDeleteFontFace(mFontFaces[i].Handle);
     }
 
+    if (mBitmapPalette != InvalidHandle)
+        mHdffCmdIf->CmdOsdDeletePalette(mBitmapPalette);
     mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
     mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
     mHdffCmdIf->CmdOsdDeleteDisplay(mDisplay);
@@ -162,6 +168,35 @@ void cHdffOsd::DrawPixel(int x, int y, tColor Color)
 void cHdffOsd::DrawBitmap(int x, int y, const cBitmap &Bitmap, tColor ColorFg, tColor ColorBg, bool ReplacePalette, bool Overlay)
 {
     printf("DrawBitmap\n");
+    int i;
+    int numColors;
+    const tColor * colors = Bitmap.Colors(numColors);
+
+    for (i = 0; i < numColors; i++)
+    {
+        mBitmapColors[i] = colors[i];
+        if (ColorFg || ColorBg)
+        {
+            if (i == 0)
+                mBitmapColors[i] = ColorBg;
+            else if (i == 1)
+                mBitmapColors[i] = ColorFg;
+        }
+    }
+    if (mBitmapPalette == InvalidHandle)
+    {
+        mBitmapPalette = mHdffCmdIf->CmdOsdCreatePalette(HDFF::colorTypeClut8,
+                HDFF::colorFormatARGB, numColors, mBitmapColors);
+    }
+    else
+    {
+        mHdffCmdIf->CmdOsdSetPaletteColors(mBitmapPalette,
+                HDFF::colorFormatARGB, 0, numColors, mBitmapColors);
+    }
+    mHdffCmdIf->CmdOsdDrawBitmap(mDisplay, mLeft + x, mTop + y,
+        (uint8_t *) Bitmap.Data(0, 0), Bitmap.Width(), Bitmap.Height(),
+        Bitmap.Width() * Bitmap.Height(), HDFF::colorTypeClut8, mBitmapPalette);
+#if 0
     uint32_t * tmpBitmap = new uint32_t[Bitmap.Width() * Bitmap.Height()];
     for (int ix = 0; ix < Bitmap.Width(); ix++)
     {
@@ -182,8 +217,11 @@ void cHdffOsd::DrawBitmap(int x, int y, const cBitmap &Bitmap, tColor ColorFg, t
             }
         }
     }
-    mHdffCmdIf->CmdOsdDrawBitmap(mDisplay, mLeft + x, mTop + y, (uint8_t *) tmpBitmap, Bitmap.Width(), Bitmap.Height(), Bitmap.Width() * Bitmap.Height() * 4, HDFF::colorTypeARGB8888, InvalidHandle);
+    mHdffCmdIf->CmdOsdDrawBitmap(mDisplay, mLeft + x, mTop + y,
+        (uint8_t *) tmpBitmap, Bitmap.Width(), Bitmap.Height(),
+        Bitmap.Width() * Bitmap.Height() * 4, HDFF::colorTypeARGB8888, InvalidHandle);
     delete[] tmpBitmap;
+#endif
     mChanged = true;
     mBitmapModified = false;
 }
