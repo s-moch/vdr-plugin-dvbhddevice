@@ -160,7 +160,7 @@ void cHdffSetupPage::Store(void)
     {
         if (mNewHdffSetup.Resolution != gHdffSetup.Resolution)
         {
-            mHdffCmdIf->CmdHdmiSetVideoMode(gHdffSetup.GetVideoMode());
+            mHdffCmdIf->CmdHdmiSetVideoMode(mNewHdffSetup.GetVideoMode());
         }
         HDFF::tVideoFormat videoFormat;
 
