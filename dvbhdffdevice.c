@@ -409,6 +409,8 @@ void cDvbHdFfDevice::TrickSpeed(int Speed)
 void cDvbHdFfDevice::Clear(void)
 {
   CHECK(ioctl(fd_video, VIDEO_CLEAR_BUFFER));
+  mHdffCmdIf->CmdAvSetVideoPid(0, 0, HDFF::videoStreamMpeg1);
+  mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF::audioStreamMpeg1);
   playVideoPid = -1;
   playAudioPid = -1;
   cDevice::Clear();
