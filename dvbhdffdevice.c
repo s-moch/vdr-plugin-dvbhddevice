@@ -437,6 +437,16 @@ void cDvbHdFfDevice::Mute(void)
   cDevice::Mute();
 }
 
+static HDFF::eVideoStreamType MapVideoStreamTypes(int Vtype)
+{
+  switch (Vtype) {
+    case 0x01: return HDFF::videoStreamMpeg1;
+    case 0x02: return HDFF::videoStreamMpeg2;
+    case 0x1B: return HDFF::videoStreamH264;
+    default: return HDFF::videoStreamMaxValue; // there is no HDFF::videoStreamNone
+    }
+}
+
 void cDvbHdFfDevice::StillPicture(const uchar *Data, int Length)
 {
   if (!Data || Length < TS_SIZE)
@@ -507,12 +517,12 @@ void cDvbHdFfDevice::StillPicture(const uchar *Data, int Length)
            else
               i++;
            }
-     mHdffCmdIf->CmdAvShowStillImage(0, (uint8_t *)buf, blen);
+     mHdffCmdIf->CmdAvShowStillImage(0, (uint8_t *)buf, blen, MapVideoStreamTypes(PatPmtParser()->Vtype()));
      free(buf);
      }
   else {
      // non-PES data
-     mHdffCmdIf->CmdAvShowStillImage(0, Data, Length);
+     mHdffCmdIf->CmdAvShowStillImage(0, Data, Length, MapVideoStreamTypes(PatPmtParser()->Vtype()));
      }
 }
 
@@ -536,16 +546,6 @@ int cDvbHdFfDevice::PlayVideo(const uchar *Data, int Length)
 int cDvbHdFfDevice::PlayAudio(const uchar *Data, int Length, uchar Id)
 {
   return WriteAllOrNothing(fd_audio, Data, Length, 1000, 10);
-}
-
-static HDFF::eVideoStreamType MapVideoStreamTypes(int Vtype)
-{
-  switch (Vtype) {
-    case 0x01: return HDFF::videoStreamMpeg1;
-    case 0x02: return HDFF::videoStreamMpeg2;
-    case 0x1B: return HDFF::videoStreamH264;
-    default: return HDFF::videoStreamMaxValue; // there is no HDFF::videoStreamNone
-    }
 }
 
 int cDvbHdFfDevice::PlayTsVideo(const uchar *Data, int Length)

@@ -219,7 +219,7 @@ void cHdffCmdIf::CmdAvSetVideoWindow(uint8_t DecoderIndex, bool Enable, uint16_t
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }
 
-void cHdffCmdIf::CmdAvShowStillImage(uint8_t DecoderIndex, const uint8_t * pStillImage, int Size)
+void cHdffCmdIf::CmdAvShowStillImage(uint8_t DecoderIndex, const uint8_t * pStillImage, int Size, eVideoStreamType StreamType)
 {
     cBitBuffer cmdBuf(MAX_CMD_LEN);
     osd_raw_cmd_t osd_cmd;
@@ -234,7 +234,7 @@ void cHdffCmdIf::CmdAvShowStillImage(uint8_t DecoderIndex, const uint8_t * pStil
     osd_cmd.cmd_data = cmdBuf.GetData();
     CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvShowStillImage);
     cmdBuf.SetBits(4, DecoderIndex);
-    cmdBuf.SetBits(4, 0); // reserved
+    cmdBuf.SetBits(4, StreamType);
     cmdBuf.SetBits(16, osd_data.data_handle);
     osd_cmd.cmd_len = CmdSetLength(cmdBuf);
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);

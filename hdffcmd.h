@@ -36,7 +36,7 @@ public:
     void CmdAvSetPcrPid(uint8_t DecoderIndex, uint16_t PcrPid);
     void CmdAvSetTeletextPid(uint8_t DecoderIndex, uint16_t TeletextPid);
     void CmdAvSetVideoWindow(uint8_t DecoderIndex, bool Enable, uint16_t X, uint16_t Y, uint16_t Width, uint16_t Height);
-    void CmdAvShowStillImage(uint8_t DecoderIndex, const uint8_t * pStillImage, int Size);
+    void CmdAvShowStillImage(uint8_t DecoderIndex, const uint8_t * pStillImage, int Size, eVideoStreamType StreamType);
     void CmdAvSetDecoderInput(uint8_t DecoderIndex, uint8_t DemultiplexerIndex);
     void CmdAvSetDemultiplexerInput(uint8_t DemultiplexerIndex, uint8_t TsInputIndex);
     void CmdAvSetVideoFormat(uint8_t DecoderIndex, tVideoFormat * pVideoFormat);
