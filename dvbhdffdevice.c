@@ -278,7 +278,7 @@ bool cDvbHdFfDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
         AddPid(Channel->Tpid(), ptTeletext);//TODO obsolete?
      }
   else if (StartTransferMode)
-     cControl::Launch(new cTransferControl(this, Channel->GetChannelID(), vpid, Channel->Apids(), Channel->Dpids(), Channel->Spids()));
+     cControl::Launch(new cTransferControl(this, Channel));
 
   return true;
 }
