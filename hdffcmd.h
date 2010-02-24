@@ -75,6 +75,8 @@ public:
                           eColorType ColorType, uint32_t hPalette);
 
     void CmdHdmiSetVideoMode(eHdmiVideoMode VideoMode);
+    void CmdRemoteSetProtocol(eRemoteProtocol Protocol);
+    void CmdRemoteSetAddressFilter(bool Enable, uint32_t Address);
 };
 
 } // end of namespace

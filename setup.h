@@ -23,6 +23,8 @@ struct cHdffSetup
     int TvFormat;
     int VideoConversion;
     int OsdSize;
+    int RemoteProtocol;
+    int RemoteAddress;
 };
 
 extern cHdffSetup gHdffSetup;

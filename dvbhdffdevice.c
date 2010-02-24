@@ -46,6 +46,8 @@ cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend)
      isHdffPrimary = true;
      mHdffCmdIf = new HDFF::cHdffCmdIf(fd_osd);
      mHdffCmdIf->CmdHdmiSetVideoMode(gHdffSetup.GetVideoMode());
+     mHdffCmdIf->CmdRemoteSetProtocol((HDFF::eRemoteProtocol) gHdffSetup.RemoteProtocol);
+     mHdffCmdIf->CmdRemoteSetAddressFilter(gHdffSetup.RemoteAddress >= 0, gHdffSetup.RemoteAddress);
      }
 
   // Video format:

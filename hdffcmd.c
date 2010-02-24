@@ -869,4 +869,34 @@ void cHdffCmdIf::CmdHdmiSetVideoMode(eHdmiVideoMode VideoMode)
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }
 
+void cHdffCmdIf::CmdRemoteSetProtocol(eRemoteProtocol Protocol)
+{
+    //printf("%s %d\n", __func__, Protocol);
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupRemoteControl, msgRemoteSetProtocol);
+    cmdBuf.SetBits(8, Protocol);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
+void cHdffCmdIf::CmdRemoteSetAddressFilter(bool Enable, uint32_t Address)
+{
+    //printf("%s %d %d\n", __func__, Enable, Address);
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupRemoteControl, msgRemoteSetAddressFilter);
+    cmdBuf.SetBits(1, Enable);
+    cmdBuf.SetBits(7, 0); // reserved
+    cmdBuf.SetBits(32, Address);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
 } // end of namespace
