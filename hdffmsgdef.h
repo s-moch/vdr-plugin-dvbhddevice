@@ -64,6 +64,7 @@ typedef enum _eMessageId
     msgMuxSetAudioMute,
 
     msgOsdConfigure = 0,
+    msgOsdReset,
     msgOsdCreateDisplay = 10,
     msgOsdDeleteDisplay,
     msgOsdEnableDisplay,
@@ -232,6 +233,11 @@ typedef enum _eDrawingFlags
     drawQuarterBottomRightInverted
 } eDrawingFlags;
 
+typedef struct _tOsdConfig
+{
+    bool FontAntialiasing;
+    bool FontKerning;
+} tOsdConfig;
 
 // HDMI definitions
 

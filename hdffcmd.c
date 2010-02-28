@@ -432,6 +432,46 @@ void cHdffCmdIf::CmdAvEnableVideoAfterStop(uint8_t DecoderIndex, bool EnableVide
 }
 
 
+void cHdffCmdIf::CmdOsdConfigure(tOsdConfig * pConfig)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupOsd, msgOsdConfigure);
+    if (pConfig->FontAntialiasing)
+    {
+        cmdBuf.SetBits(1, 1);
+    }
+    else
+    {
+        cmdBuf.SetBits(1, 0);
+    }
+    if (pConfig->FontKerning)
+    {
+        cmdBuf.SetBits(1, 1);
+    }
+    else
+    {
+        cmdBuf.SetBits(1, 0);
+    }
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
+void cHdffCmdIf::CmdOsdReset(void)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupOsd, msgOsdReset);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
 uint32_t cHdffCmdIf::CmdOsdCreateDisplay(uint32_t Width, uint32_t Height, eColorType ColorType)
 {
     //printf("CreateDisplay %d %d %d\n", Width, Height, ColorType);

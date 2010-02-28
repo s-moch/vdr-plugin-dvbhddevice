@@ -48,6 +48,9 @@ public:
     void CmdAvSetAudioSpeed(uint8_t DecoderIndex, int32_t Speed);
     void CmdAvEnableVideoAfterStop(uint8_t DecoderIndex, bool EnableVideoAfterStop);
 
+    void CmdOsdConfigure(tOsdConfig * pConfig);
+    void CmdOsdReset(void);
+
     uint32_t CmdOsdCreateDisplay(uint32_t Width, uint32_t Height, eColorType ColorType);
     void CmdOsdDeleteDisplay(uint32_t hDisplay);
     void CmdOsdEnableDisplay(uint32_t hDisplay, bool Enable);

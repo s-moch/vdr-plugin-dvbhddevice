@@ -69,6 +69,7 @@ cHdffOsd::cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level)
 :   cOsd(Left, Top, Level)
 {
     double pixelAspect;
+    HDFF::tOsdConfig config;
 
     mHdffCmdIf = pHdffCmdIf;
     mLeft = Left;
@@ -77,6 +78,10 @@ cHdffOsd::cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level)
     mChanged = false;
     mBitmapModified = false;
     mBitmapPalette = InvalidHandle;
+    config.FontKerning = false;
+    config.FontAntialiasing = Setup.AntiAlias ? true : false;
+    mHdffCmdIf->CmdOsdConfigure(&config);
+
     gHdffSetup.GetOsdSize(mDispWidth, mDispHeight, pixelAspect);
     mDisplay = mHdffCmdIf->CmdOsdCreateDisplay(mDispWidth, mDispHeight, HDFF::colorTypeARGB8888);
     mHdffCmdIf->CmdOsdSetDisplayOutputRectangle(mDisplay, 0, 0, SizeFullScreen, SizeFullScreen);
