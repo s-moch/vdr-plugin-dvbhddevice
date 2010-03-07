@@ -67,7 +67,7 @@ protected:
 // Audio facilities
 
 private:
-  bool digitalAudio;//TODO obsolete?
+  int audioChannel;
 protected:
   virtual int GetAudioChannelDevice(void);
   virtual void SetAudioChannelDevice(int AudioChannel);

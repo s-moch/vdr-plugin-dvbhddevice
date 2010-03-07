@@ -444,6 +444,19 @@ void cHdffCmdIf::CmdAvSetAudioDelay(int16_t Delay)
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }
 
+void cHdffCmdIf::CmdAvSetAudioChannel(uint8_t AudioChannel)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetAudioChannel);
+    cmdBuf.SetBits(8, AudioChannel);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
 
 void cHdffCmdIf::CmdOsdConfigure(tOsdConfig * pConfig)
 {

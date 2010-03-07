@@ -28,7 +28,7 @@ cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend)
 :cDvbDevice(Adapter, Frontend)
 {
   spuDecoder = NULL;
-  digitalAudio = false;
+  audioChannel = 0;
   playMode = pmNone;
   mHdffCmdIf = NULL;
 
@@ -289,14 +289,13 @@ bool cDvbHdFfDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
 
 int cDvbHdFfDevice::GetAudioChannelDevice(void)
 {
-  audio_status_t as;
-  CHECK(ioctl(fd_audio, AUDIO_GET_STATUS, &as));
-  return as.channel_select;
+  return audioChannel;
 }
 
 void cDvbHdFfDevice::SetAudioChannelDevice(int AudioChannel)
 {
-  //CHECK(ioctl(fd_audio, AUDIO_SET_MIXER, &am));//TODO
+  mHdffCmdIf->CmdAvSetAudioChannel(AudioChannel);
+  audioChannel = AudioChannel;
 }
 
 void cDvbHdFfDevice::SetVolumeDevice(int Volume)
