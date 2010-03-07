@@ -431,6 +431,19 @@ void cHdffCmdIf::CmdAvEnableVideoAfterStop(uint8_t DecoderIndex, bool EnableVide
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }
 
+void cHdffCmdIf::CmdAvSetAudioDelay(int16_t Delay)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetAudioDelay);
+    cmdBuf.SetBits(16, Delay);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
 
 void cHdffCmdIf::CmdOsdConfigure(tOsdConfig * pConfig)
 {

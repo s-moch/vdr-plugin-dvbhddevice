@@ -83,6 +83,7 @@ cHdffSetup::cHdffSetup(void)
     TvFormat = HDFF::tvFormat16by9;
     VideoConversion = HDFF::videoConversionPillarbox;
     AnalogueVideo = HDFF::videoOutCvbsYuv;
+    AudioDelay = 0;
     OsdSize = 0;
     RemoteProtocol = 1;
     RemoteAddress = -1;
@@ -94,6 +95,7 @@ bool cHdffSetup::SetupParse(const char *Name, const char *Value)
     else if (strcmp(Name, "TvFormat")        == 0) TvFormat        = atoi(Value);
     else if (strcmp(Name, "VideoConversion") == 0) VideoConversion = atoi(Value);
     else if (strcmp(Name, "AnalogueVideo")   == 0) AnalogueVideo   = atoi(Value);
+    else if (strcmp(Name, "AudioDelay")      == 0) AudioDelay      = atoi(Value);
     else if (strcmp(Name, "OsdSize")         == 0) OsdSize         = atoi(Value);
     else if (strcmp(Name, "RemoteProtocol")  == 0) RemoteProtocol  = atoi(Value);
     else if (strcmp(Name, "RemoteAddress")   == 0) RemoteAddress   = atoi(Value);
@@ -168,6 +170,7 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     Add(new cMenuEditStraItem("TV format", &mNewHdffSetup.TvFormat, kTvFormats, TvFormatItems));
     Add(new cMenuEditStraItem("Video Conversion", &mNewHdffSetup.VideoConversion, kVideoConversions, VideoConversionItems));
     Add(new cMenuEditStraItem("Analogue Video", &mNewHdffSetup.AnalogueVideo, kAnalogueVideos, AnalogueVideoItems));
+    Add(new cMenuEditIntItem("Audio Delay (ms)", &mNewHdffSetup.AudioDelay, 0, 500));
     Add(new cMenuEditStraItem("Osd Size", &mNewHdffSetup.OsdSize, kOsdSizes, OsdSizeItems));
     Add(new cMenuEditStraItem("Remote Control Protocol", &mNewHdffSetup.RemoteProtocol, kRemoteProtocols, RemoteProtocolItems));
     Add(new cMenuEditIntItem("Remote Control Address", &mNewHdffSetup.RemoteAddress, -1, 31));
@@ -183,6 +186,7 @@ void cHdffSetupPage::Store(void)
     SetupStore("TvFormat", mNewHdffSetup.TvFormat);
     SetupStore("VideoConversion", mNewHdffSetup.VideoConversion);
     SetupStore("AnalogueVideo", mNewHdffSetup.AnalogueVideo);
+    SetupStore("AudioDelay", mNewHdffSetup.AudioDelay);
     SetupStore("OsdSize", mNewHdffSetup.OsdSize);
     SetupStore("RemoteProtocol", mNewHdffSetup.RemoteProtocol);
     SetupStore("RemoteAddress", mNewHdffSetup.RemoteAddress);
@@ -200,6 +204,8 @@ void cHdffSetupPage::Store(void)
         videoFormat.TvFormat = (HDFF::eTvFormat) mNewHdffSetup.TvFormat;
         videoFormat.VideoConversion = (HDFF::eVideoConversion) mNewHdffSetup.VideoConversion;
         mHdffCmdIf->CmdAvSetVideoFormat(0, &videoFormat);
+
+        mHdffCmdIf->CmdAvSetAudioDelay(mNewHdffSetup.AudioDelay);
 
         mHdffCmdIf->CmdMuxSetVideoOut((HDFF::eVideoOut) mNewHdffSetup.AnalogueVideo);
 

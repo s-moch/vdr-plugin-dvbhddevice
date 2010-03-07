@@ -23,6 +23,7 @@ struct cHdffSetup
     int TvFormat;
     int VideoConversion;
     int AnalogueVideo;
+    int AudioDelay;
     int OsdSize;
     int RemoteProtocol;
     int RemoteAddress;

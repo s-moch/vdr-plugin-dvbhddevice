@@ -56,6 +56,8 @@ typedef enum _eMessageId
     msgAvSetAudioSpeed,
     msgAvEnableVideoAfterStop,
     msgAvGetVideoFormatInfo,
+    msgAvSetAudioDelay,
+    msgAvSetAudioDownmix,
 
     msgMuxSetVideoOut = 0,
     msgMuxSetSlowBlank,

@@ -47,6 +47,7 @@ public:
     void CmdAvSetVideoSpeed(uint8_t DecoderIndex, int32_t Speed);
     void CmdAvSetAudioSpeed(uint8_t DecoderIndex, int32_t Speed);
     void CmdAvEnableVideoAfterStop(uint8_t DecoderIndex, bool EnableVideoAfterStop);
+    void CmdAvSetAudioDelay(int16_t Delay);
 
     void CmdOsdConfigure(tOsdConfig * pConfig);
     void CmdOsdReset(void);

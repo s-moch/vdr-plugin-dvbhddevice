@@ -45,6 +45,8 @@ cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend)
      devHdffOffset = adapter;
      isHdffPrimary = true;
      mHdffCmdIf = new HDFF::cHdffCmdIf(fd_osd);
+     mHdffCmdIf->CmdAvSetAudioDelay(gHdffSetup.AudioDelay);
+     mHdffCmdIf->CmdMuxSetVideoOut((HDFF::eVideoOut) gHdffSetup.AnalogueVideo);
      mHdffCmdIf->CmdHdmiSetVideoMode(gHdffSetup.GetVideoMode());
      mHdffCmdIf->CmdRemoteSetProtocol((HDFF::eRemoteProtocol) gHdffSetup.RemoteProtocol);
      mHdffCmdIf->CmdRemoteSetAddressFilter(gHdffSetup.RemoteAddress >= 0, gHdffSetup.RemoteAddress);
@@ -304,13 +306,7 @@ void cDvbHdFfDevice::SetVolumeDevice(int Volume)
 
 void cDvbHdFfDevice::SetDigitalAudioDevice(bool On)
 {
-  //TODO
-  if (digitalAudio != On) {
-     if (digitalAudio)
-        cCondWait::SleepMs(1000); // Wait until any leftover digital data has been flushed
-     digitalAudio = On;
-     SetVolumeDevice(On || IsMute() ? 0 : CurrentVolume());
-     }
+  // not needed
 }
 
 void cDvbHdFfDevice::SetAudioTrackDevice(eTrackType Type)
