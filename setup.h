@@ -24,6 +24,7 @@ struct cHdffSetup
     int VideoConversion;
     int AnalogueVideo;
     int AudioDelay;
+    int AudioDownmix;
     int OsdSize;
     int RemoteProtocol;
     int RemoteAddress;

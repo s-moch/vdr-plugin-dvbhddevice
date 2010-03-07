@@ -162,6 +162,15 @@ typedef enum _eVideoOutputMode
     videoOutputMaxValue
 } eVideoOutputMode;
 
+typedef enum _eDownmixMode
+{
+    downmixOff,
+    downmixAnalog,
+    downmixAlways,
+    downmixAutomatic,
+    downmixHdmi
+} eDownmixMode;
+
 // AvMux definitions
 
 typedef enum _eVideoOut

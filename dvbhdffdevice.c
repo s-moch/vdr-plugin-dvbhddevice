@@ -46,6 +46,7 @@ cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend)
      isHdffPrimary = true;
      mHdffCmdIf = new HDFF::cHdffCmdIf(fd_osd);
      mHdffCmdIf->CmdAvSetAudioDelay(gHdffSetup.AudioDelay);
+     mHdffCmdIf->CmdAvSetAudioDownmix((HDFF::eDownmixMode) gHdffSetup.AudioDownmix);
      mHdffCmdIf->CmdMuxSetVideoOut((HDFF::eVideoOut) gHdffSetup.AnalogueVideo);
      mHdffCmdIf->CmdHdmiSetVideoMode(gHdffSetup.GetVideoMode());
      mHdffCmdIf->CmdRemoteSetProtocol((HDFF::eRemoteProtocol) gHdffSetup.RemoteProtocol);

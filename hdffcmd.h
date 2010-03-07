@@ -48,6 +48,7 @@ public:
     void CmdAvSetAudioSpeed(uint8_t DecoderIndex, int32_t Speed);
     void CmdAvEnableVideoAfterStop(uint8_t DecoderIndex, bool EnableVideoAfterStop);
     void CmdAvSetAudioDelay(int16_t Delay);
+    void CmdAvSetAudioDownmix(eDownmixMode DownmixMode);
     void CmdAvSetAudioChannel(uint8_t AudioChannel);
 
     void CmdOsdConfigure(tOsdConfig * pConfig);
