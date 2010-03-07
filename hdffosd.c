@@ -100,7 +100,7 @@ cHdffOsd::cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level)
 
 cHdffOsd::~cHdffOsd()
 {
-    printf("~cHdffOsd %d %d\n", mLeft, mTop);
+    //printf("~cHdffOsd %d %d\n", mLeft, mTop);
     SetActive(false);
 
     for (int i = 0; i < MAX_NUM_FONTS; i++)
@@ -134,7 +134,7 @@ eOsdError cHdffOsd::SetAreas(const tArea *Areas, int NumAreas)
 {
     for (int i = 0; i < NumAreas; i++)
     {
-        printf("SetAreas %d: %d %d %d %d %d\n", i, Areas[i].x1, Areas[i].y1, Areas[i].x2, Areas[i].y2, Areas[i].bpp);
+        //printf("SetAreas %d: %d %d %d %d %d\n", i, Areas[i].x1, Areas[i].y1, Areas[i].x2, Areas[i].y2, Areas[i].bpp);
     }
     mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
     mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
@@ -166,13 +166,13 @@ void cHdffOsd::RestoreRegion(void)
 
 void cHdffOsd::DrawPixel(int x, int y, tColor Color)
 {
-    printf("DrawPixel\n");
+    //printf("DrawPixel\n");
     mBitmapModified = false;
 }
 
 void cHdffOsd::DrawBitmap(int x, int y, const cBitmap &Bitmap, tColor ColorFg, tColor ColorBg, bool ReplacePalette, bool Overlay)
 {
-    printf("DrawBitmap\n");
+    //printf("DrawBitmap\n");
     int i;
     int numColors;
     const tColor * colors = Bitmap.Colors(numColors);
@@ -519,6 +519,6 @@ cHdffOsdProvider::cHdffOsdProvider(HDFF::cHdffCmdIf * HdffCmdIf)
 
 cOsd *cHdffOsdProvider::CreateOsd(int Left, int Top, uint Level)
 {
-    printf("CreateOsd %d %d %d\n", Left, Top, Level);
+    //printf("CreateOsd %d %d %d\n", Left, Top, Level);
     return new cHdffOsd(Left, Top, mHdffCmdIf, Level);
 }
