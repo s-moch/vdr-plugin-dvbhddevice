@@ -12,6 +12,7 @@
 const int kResolutions = 4;
 const int kTvFormats = 2;
 const int kVideoConversions = 6;
+const int kAnalogueVideos = 4;
 const int kOsdSizes = 5;
 const int kRemoteProtocols = 3;
 
@@ -47,6 +48,15 @@ static const char * VideoConversionItems[] =
     NULL
 };
 
+static const char * AnalogueVideoItems[] =
+{
+    "disabled",
+    "RGB",
+    "CVBS + YUV",
+    "YC (S-Video)",
+    NULL
+};
+
 static const char * OsdSizeItems[] =
 {
     "Follow resolution",
@@ -72,6 +82,7 @@ cHdffSetup::cHdffSetup(void)
     Resolution = kResolution1080i;
     TvFormat = HDFF::tvFormat16by9;
     VideoConversion = HDFF::videoConversionPillarbox;
+    AnalogueVideo = HDFF::videoOutCvbsYuv;
     OsdSize = 0;
     RemoteProtocol = 1;
     RemoteAddress = -1;
@@ -82,6 +93,7 @@ bool cHdffSetup::SetupParse(const char *Name, const char *Value)
     if      (strcmp(Name, "Resolution")      == 0) Resolution      = atoi(Value);
     else if (strcmp(Name, "TvFormat")        == 0) TvFormat        = atoi(Value);
     else if (strcmp(Name, "VideoConversion") == 0) VideoConversion = atoi(Value);
+    else if (strcmp(Name, "AnalogueVideo")   == 0) AnalogueVideo   = atoi(Value);
     else if (strcmp(Name, "OsdSize")         == 0) OsdSize         = atoi(Value);
     else if (strcmp(Name, "RemoteProtocol")  == 0) RemoteProtocol  = atoi(Value);
     else if (strcmp(Name, "RemoteAddress")   == 0) RemoteAddress   = atoi(Value);
@@ -155,6 +167,7 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     Add(new cMenuEditStraItem("Resolution", &mNewHdffSetup.Resolution, kResolutions, ResolutionItems));
     Add(new cMenuEditStraItem("TV format", &mNewHdffSetup.TvFormat, kTvFormats, TvFormatItems));
     Add(new cMenuEditStraItem("Video Conversion", &mNewHdffSetup.VideoConversion, kVideoConversions, VideoConversionItems));
+    Add(new cMenuEditStraItem("Analogue Video", &mNewHdffSetup.AnalogueVideo, kAnalogueVideos, AnalogueVideoItems));
     Add(new cMenuEditStraItem("Osd Size", &mNewHdffSetup.OsdSize, kOsdSizes, OsdSizeItems));
     Add(new cMenuEditStraItem("Remote Control Protocol", &mNewHdffSetup.RemoteProtocol, kRemoteProtocols, RemoteProtocolItems));
     Add(new cMenuEditIntItem("Remote Control Address", &mNewHdffSetup.RemoteAddress, -1, 31));
@@ -169,6 +182,7 @@ void cHdffSetupPage::Store(void)
     SetupStore("Resolution", mNewHdffSetup.Resolution);
     SetupStore("TvFormat", mNewHdffSetup.TvFormat);
     SetupStore("VideoConversion", mNewHdffSetup.VideoConversion);
+    SetupStore("AnalogueVideo", mNewHdffSetup.AnalogueVideo);
     SetupStore("OsdSize", mNewHdffSetup.OsdSize);
     SetupStore("RemoteProtocol", mNewHdffSetup.RemoteProtocol);
     SetupStore("RemoteAddress", mNewHdffSetup.RemoteAddress);
@@ -186,6 +200,8 @@ void cHdffSetupPage::Store(void)
         videoFormat.TvFormat = (HDFF::eTvFormat) mNewHdffSetup.TvFormat;
         videoFormat.VideoConversion = (HDFF::eVideoConversion) mNewHdffSetup.VideoConversion;
         mHdffCmdIf->CmdAvSetVideoFormat(0, &videoFormat);
+
+        mHdffCmdIf->CmdMuxSetVideoOut((HDFF::eVideoOut) mNewHdffSetup.AnalogueVideo);
 
         mHdffCmdIf->CmdRemoteSetProtocol((HDFF::eRemoteProtocol) mNewHdffSetup.RemoteProtocol);
         mHdffCmdIf->CmdRemoteSetAddressFilter(mNewHdffSetup.RemoteAddress >= 0, mNewHdffSetup.RemoteAddress);

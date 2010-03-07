@@ -299,12 +299,7 @@ void cDvbHdFfDevice::SetAudioChannelDevice(int AudioChannel)
 
 void cDvbHdFfDevice::SetVolumeDevice(int Volume)
 {
-  if (digitalAudio)
-     Volume = 0;
-  audio_mixer_t am;
-  // conversion for linear volume response:
-  am.volume_left = am.volume_right = 2 * Volume - Volume * Volume / 255;
-  //CHECK(ioctl(fd_audio, AUDIO_SET_MIXER, &am));//TODO
+  mHdffCmdIf->CmdMuxSetVolume(Volume * 100 / 255);
 }
 
 void cDvbHdFfDevice::SetDigitalAudioDevice(bool On)

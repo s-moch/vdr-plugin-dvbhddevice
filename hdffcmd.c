@@ -895,6 +895,47 @@ void cHdffCmdIf::CmdOsdDrawBitmap(uint32_t hDisplay, int X, int Y,
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }
 
+void cHdffCmdIf::CmdMuxSetVideoOut(eVideoOut VideoOut)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvMux, msgMuxSetVideoOut);
+    cmdBuf.SetBits(4, VideoOut);
+    cmdBuf.SetBits(4, 0); // reserved
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
+void cHdffCmdIf::CmdMuxSetVolume(uint8_t Volume)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvMux, msgMuxSetVolume);
+    cmdBuf.SetBits(8, Volume);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
+void cHdffCmdIf::CmdMuxMuteAudio(bool Mute)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvMux, msgMuxSetAudioMute);
+    cmdBuf.SetBits(1, Mute);
+    cmdBuf.SetBits(7, 0); // reserved
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
 void cHdffCmdIf::CmdHdmiSetVideoMode(eHdmiVideoMode VideoMode)
 {
     //printf("HdmiSetVideoMode %d\n", VideoMode);

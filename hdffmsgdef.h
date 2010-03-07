@@ -165,7 +165,7 @@ typedef enum _eVideoOut
 {
     videoOutDisabled,
     videoOutRgb,
-    videoOutCvbs,
+    videoOutCvbsYuv,
     videoOutYc,
     videoOutMaxValue
 } eVideoOut;

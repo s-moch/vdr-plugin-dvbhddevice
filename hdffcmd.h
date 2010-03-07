@@ -77,7 +77,12 @@ public:
                           uint8_t * pBitmap, int BmpWidth, int BmpHeight, int BmpSize,
                           eColorType ColorType, uint32_t hPalette);
 
+    void CmdMuxSetVideoOut(eVideoOut VideoOut);
+    void CmdMuxSetVolume(uint8_t Volume);
+    void CmdMuxMuteAudio(bool Mute);
+
     void CmdHdmiSetVideoMode(eHdmiVideoMode VideoMode);
+
     void CmdRemoteSetProtocol(eRemoteProtocol Protocol);
     void CmdRemoteSetAddressFilter(bool Enable, uint32_t Address);
 };
