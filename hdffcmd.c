@@ -136,7 +136,7 @@ uint32_t cHdffCmdIf::CmdGetCopyrights(uint8_t Index, char * pString, uint32_t Ma
 
 void cHdffCmdIf::CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVideoStreamType StreamType)
 {
-    printf("SetVideoPid %d\n", VideoPid);
+    printf("SetVideoPid %d %d\n", VideoPid, StreamType);
     cBitBuffer cmdBuf(MAX_CMD_LEN);
     osd_raw_cmd_t osd_cmd;
 
