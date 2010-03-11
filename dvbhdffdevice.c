@@ -438,7 +438,7 @@ static HDFF::eVideoStreamType MapVideoStreamTypes(int Vtype)
     case 0x01: return HDFF::videoStreamMpeg1;
     case 0x02: return HDFF::videoStreamMpeg2;
     case 0x1B: return HDFF::videoStreamH264;
-    default: return HDFF::videoStreamMaxValue; // there is no HDFF::videoStreamNone
+    default: return HDFF::videoStreamMpeg2; // fallback to MPEG2
     }
 }
 
