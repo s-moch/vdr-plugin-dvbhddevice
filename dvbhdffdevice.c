@@ -533,14 +533,14 @@ bool cDvbHdFfDevice::Flush(int TimeoutMs)
   return true;
 }
 
-void cDvbHdFfDevice::BuildTsPacket(uint8_t * TsBuffer, bool PusiSet, uint16_t Pid, uint8_t Counter, const uint8_t * Data, uint8_t Length)
+void cDvbHdFfDevice::BuildTsPacket(uint8_t * TsBuffer, bool PusiSet, uint16_t Pid, uint8_t Counter, const uint8_t * Data, uint32_t Length)
 {
+    TsBuffer[0] = 0x47;
+    TsBuffer[1] = PusiSet ? 0x40 : 0x00;
+    TsBuffer[1] |= Pid >> 8;
+    TsBuffer[2] = Pid & 0xFF;
     if (Length >= 184)
     {
-        TsBuffer[0] = 0x47;
-        TsBuffer[1] = PusiSet ? 0x40 : 0x00;
-        TsBuffer[1] |= Pid >> 8;
-        TsBuffer[2] = Pid & 0xFF;
         TsBuffer[3] = 0x10 | Counter;
         memcpy(TsBuffer + 4, Data, 184);
     }
@@ -548,10 +548,6 @@ void cDvbHdFfDevice::BuildTsPacket(uint8_t * TsBuffer, bool PusiSet, uint16_t Pi
     {
         uint8_t adaptationLength;
 
-        TsBuffer[0] = 0x47;
-        TsBuffer[1] = PusiSet ? 0x40 : 0x00;
-        TsBuffer[1] |= Pid >> 8;
-        TsBuffer[2] = Pid & 0xFF;
         TsBuffer[3] = 0x30 | Counter;
         adaptationLength = 183 - Length;
         TsBuffer[4] = adaptationLength;
@@ -567,25 +563,20 @@ void cDvbHdFfDevice::BuildTsPacket(uint8_t * TsBuffer, bool PusiSet, uint16_t Pi
 uint32_t cDvbHdFfDevice::PesToTs(uint8_t * TsBuffer, uint16_t Pid, uint8_t & Counter, const uint8_t * Data, uint32_t Length)
 {
     uint32_t tsOffset;
-    bool first = true;
     uint32_t i;
-    uint32_t rest;
 
     tsOffset = 0;
-    for (i = 0; i < Length / 184; i++)
+    i = 0;
+    while (Length > 0)
     {
-        BuildTsPacket(TsBuffer + tsOffset, first, Pid, Counter, Data + i * 184, 184);
+        BuildTsPacket(TsBuffer + tsOffset, i == 0, Pid, Counter, Data + i * 184, Length);
+        if (Length >= 184)
+            Length -= 184;
+        else
+            Length = 0;
         Counter = (Counter + 1) & 15;
-        first = false;
         tsOffset += 188;
-    }
-    rest = Length % 184;
-    if (rest > 0)
-    {
-        BuildTsPacket(TsBuffer + tsOffset, first, Pid, Counter, Data + i * 184, rest);
-        Counter = (Counter + 1) & 15;
-        first = false;
-        tsOffset += 188;
+        i++;
     }
     return tsOffset;
 }
