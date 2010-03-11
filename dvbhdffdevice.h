@@ -81,12 +81,10 @@ private:
   int playAudioPid;
 
   // Pes2Ts conversion stuff
-  bool pesPlayback;
-  HDFF::eAudioStreamType pesAudioStreamType;
   uint8_t videoCounter;
   uint8_t audioCounter;
   void BuildTsPacket(uint8_t * TsBuffer, bool PusiSet, uint16_t Pid, uint8_t Counter, const uint8_t * Data, uint8_t Length);
-  uint32_t PesToTs(const uint8_t * Data, uint32_t Length);
+  uint32_t PesToTs(uint8_t * TsBuffer, uint16_t Pid, uint8_t & Counter, const uint8_t * Data, uint32_t Length);
 
 protected:
   ePlayMode playMode;

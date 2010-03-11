@@ -361,7 +361,6 @@ bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
 
      playVideoPid = -1;
      playAudioPid = -1;
-     pesPlayback = false;
      audioCounter = 0;
      videoCounter = 0;
 
@@ -565,108 +564,86 @@ void cDvbHdFfDevice::BuildTsPacket(uint8_t * TsBuffer, bool PusiSet, uint16_t Pi
     }
 }
 
-uint32_t cDvbHdFfDevice::PesToTs(const uint8_t * Data, uint32_t Length)
+uint32_t cDvbHdFfDevice::PesToTs(uint8_t * TsBuffer, uint16_t Pid, uint8_t & Counter, const uint8_t * Data, uint32_t Length)
 {
-    uint8_t tsBuffer[188 * 16];
     uint32_t tsOffset;
-    uint8_t streamId;
     bool first = true;
     uint32_t i;
     uint32_t rest;
 
     tsOffset = 0;
-    streamId = Data[3];
-    if (streamId >= 0xE0 && streamId <= 0xEF)
+    for (i = 0; i < Length / 184; i++)
     {
-        for (i = 0; i < Length / 184; i++)
-        {
-            BuildTsPacket(tsBuffer + tsOffset, first, 100, videoCounter, Data + i * 184, 184);
-            videoCounter = (videoCounter + 1) & 15;
-            first = false;
-            tsOffset += 188;
-        }
-        rest = Length % 184;
-        if (rest > 0)
-        {
-            BuildTsPacket(tsBuffer + tsOffset, first, 100, videoCounter, Data + i * 184, rest);
-            videoCounter = (videoCounter + 1) & 15;
-            first = false;
-            tsOffset += 188;
-        }
-        if (PlayTsVideo(tsBuffer, tsOffset) <= 0)
-            Length = 0;
+        BuildTsPacket(TsBuffer + tsOffset, first, Pid, Counter, Data + i * 184, 184);
+        Counter = (Counter + 1) & 15;
+        first = false;
+        tsOffset += 188;
     }
-    else if (streamId >= 0xC0 && streamId <= 0xDF)
+    rest = Length % 184;
+    if (rest > 0)
     {
-        pesAudioStreamType = HDFF::audioStreamMpeg1;
-        for (i = 0; i < Length / 184; i++)
-        {
-            BuildTsPacket(tsBuffer + tsOffset, first, 101, audioCounter, Data + i * 184, 184);
-            audioCounter = (audioCounter + 1) & 15;
-            first = false;
-            tsOffset += 188;
-        }
-        rest = Length % 184;
-        if (rest > 0)
-        {
-            BuildTsPacket(tsBuffer + tsOffset, first, 101, audioCounter, Data + i * 184, rest);
-            audioCounter = (audioCounter + 1) & 15;
-            first = false;
-            tsOffset += 188;
-        }
-        if (PlayTsAudio(tsBuffer, tsOffset) <= 0)
-            Length = 0;
+        BuildTsPacket(TsBuffer + tsOffset, first, Pid, Counter, Data + i * 184, rest);
+        Counter = (Counter + 1) & 15;
+        first = false;
+        tsOffset += 188;
     }
-    else if (streamId == 0xBD)
-    {
-        pesAudioStreamType = HDFF::audioStreamAc3;//TODO: other stream types, especially LPCM
-        for (i = 0; i < Length / 184; i++)
-        {
-            BuildTsPacket(tsBuffer + tsOffset, first, 102, audioCounter, Data + i * 184, 184);
-            audioCounter = (audioCounter + 1) & 15;
-            first = false;
-            tsOffset += 188;
-        }
-        rest = Length % 184;
-        if (rest > 0)
-        {
-            BuildTsPacket(tsBuffer + tsOffset, first, 102, audioCounter, Data + i * 184, rest);
-            audioCounter = (audioCounter + 1) & 15;
-            first = false;
-            tsOffset += 188;
-        }
-        if (PlayTsAudio(tsBuffer, tsOffset) <= 0)
-            Length = 0;
-    }
-    return Length;
+    return tsOffset;
 }
 
 int cDvbHdFfDevice::PlayVideo(const uchar *Data, int Length)
 {
-    pesPlayback = true;
-    return PesToTs(Data, Length);
+    //TODO: support greater Length
+    uint8_t tsBuffer[188 * 16];
+    uint32_t tsLength;
+    int pid = 100;
+
+    tsLength = PesToTs(tsBuffer, pid, videoCounter, Data, Length);
+
+    if (pid != playVideoPid) {
+        playVideoPid = pid;
+        mHdffCmdIf->CmdAvSetVideoPid(0, playVideoPid, HDFF::videoStreamMpeg2);
+    }
+    if (WriteAllOrNothing(fd_video, tsBuffer, tsLength, 1000, 10) <= 0)
+        Length = 0;
+    return Length;
 }
 
 int cDvbHdFfDevice::PlayAudio(const uchar *Data, int Length, uchar Id)
 {
-    pesPlayback = true;
-    return PesToTs(Data, Length);
+    uint8_t streamId;
+    uint8_t tsBuffer[188 * 16];
+    uint32_t tsLength;
+    HDFF::eAudioStreamType streamType;
+    int pid;
+
+    streamId = Data[3];
+    if (streamId >= 0xC0 && streamId <= 0xDF)
+    {
+        streamType = HDFF::audioStreamMpeg1;
+    }
+    else if (streamId == 0xBD)
+    {
+        streamType = HDFF::audioStreamAc3;//TODO: other stream types, especially LPCM
+    }
+    pid = 200 + (int) streamType;
+    tsLength = PesToTs(tsBuffer, pid, audioCounter, Data, Length);
+
+    if (pid != playAudioPid) {
+        playAudioPid = pid;
+        mHdffCmdIf->CmdAvSetAudioPid(0, playAudioPid, streamType);
+    }
+    if (WriteAllOrNothing(fd_video, tsBuffer, tsLength, 1000, 10) <= 0)
+        Length = 0;
+    return Length;
 }
 
 int cDvbHdFfDevice::PlayTsVideo(const uchar *Data, int Length)
 {
   int pid = TsPid(Data);
   if (pid != playVideoPid) {
-     HDFF::eVideoStreamType streamType;
      playVideoPid = pid;
-     if (pesPlayback) {
-        streamType = HDFF::videoStreamMpeg2;
-        }
-     else {
-        PatPmtParser();
-        streamType = MapVideoStreamTypes(PatPmtParser()->Vtype());
-        }
-     mHdffCmdIf->CmdAvSetVideoPid(0, playVideoPid, streamType);
+     PatPmtParser();
+     mHdffCmdIf->CmdAvSetVideoPid(0, playVideoPid, MapVideoStreamTypes(PatPmtParser()->Vtype()));
      }
   return WriteAllOrNothing(fd_video, Data, Length, 1000, 10);
 }
@@ -685,30 +662,23 @@ int cDvbHdFfDevice::PlayTsAudio(const uchar *Data, int Length)
 {
   int pid = TsPid(Data);
   if (pid != playAudioPid) {
-     HDFF::eAudioStreamType streamType;
      playAudioPid = pid;
-     if (pesPlayback) {
-        streamType = pesAudioStreamType;
-        }
-     else {
-        int AudioStreamType = -1;
-        for (int i = 0; PatPmtParser()->Apid(i); i++) {
-            if (playAudioPid == PatPmtParser()->Apid(i)) {
-               AudioStreamType = PatPmtParser()->Atype(i);
+     int AudioStreamType = -1;
+     for (int i = 0; PatPmtParser()->Apid(i); i++) {
+         if (playAudioPid == PatPmtParser()->Apid(i)) {
+            AudioStreamType = PatPmtParser()->Atype(i);
+            break;
+            }
+         }
+     if (AudioStreamType < 0) {
+        for (int i = 0; PatPmtParser()->Dpid(i); i++) {
+            if (playAudioPid == PatPmtParser()->Dpid(i)) {
+               AudioStreamType = PatPmtParser()->Dtype(i);
                break;
                }
             }
-        if (AudioStreamType < 0) {
-           for (int i = 0; PatPmtParser()->Dpid(i); i++) {
-               if (playAudioPid == PatPmtParser()->Dpid(i)) {
-                  AudioStreamType = PatPmtParser()->Dtype(i);
-                  break;
-                  }
-               }
-           }
-        streamType = MapAudioStreamTypes(AudioStreamType);
         }
-     mHdffCmdIf->CmdAvSetAudioPid(0, playAudioPid, streamType);
+     mHdffCmdIf->CmdAvSetAudioPid(0, playAudioPid, MapAudioStreamTypes(AudioStreamType));
      }
   return WriteAllOrNothing(fd_video, Data, Length, 1000, 10);
 }
