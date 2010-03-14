@@ -614,7 +614,11 @@ int cDvbHdFfDevice::PlayAudio(const uchar *Data, int Length, uchar Id)
     }
     else if (streamId == 0xBD)
     {
-        streamType = HDFF::audioStreamAc3;//TODO: other stream types, especially LPCM
+        const uint8_t * payload = Data + 9 + Data[8];
+        if (payload[0] == 0xA0)
+            streamType = HDFF::audioStreamPcm;
+        else
+            streamType = HDFF::audioStreamAc3;
     }
     pid = 200 + (int) streamType;
     tsLength = PesToTs(tsBuffer, pid, audioCounter, Data, Length);
