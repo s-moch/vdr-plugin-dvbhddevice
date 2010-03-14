@@ -49,6 +49,13 @@ cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend)
      mHdffCmdIf->CmdAvSetAudioDownmix((HDFF::eDownmixMode) gHdffSetup.AudioDownmix);
      mHdffCmdIf->CmdMuxSetVideoOut((HDFF::eVideoOut) gHdffSetup.AnalogueVideo);
      mHdffCmdIf->CmdHdmiSetVideoMode(gHdffSetup.GetVideoMode());
+     HDFF::tHdmiConfig hdmiConfig;
+     hdmiConfig.TransmitAudio = true;
+     hdmiConfig.ForceDviMode = false;
+     hdmiConfig.CecEnabled = gHdffSetup.CecEnabled;
+     mHdffCmdIf->CmdHdmiConfigure(&hdmiConfig);
+     if (gHdffSetup.CecEnabled)
+        mHdffCmdIf->CmdHdmiSendCecCommand(HDFF::cecCommandTvOn);
      mHdffCmdIf->CmdRemoteSetProtocol((HDFF::eRemoteProtocol) gHdffSetup.RemoteProtocol);
      mHdffCmdIf->CmdRemoteSetAddressFilter(gHdffSetup.RemoteAddress >= 0, gHdffSetup.RemoteAddress);
      }

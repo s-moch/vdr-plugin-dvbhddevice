@@ -26,6 +26,7 @@ struct cHdffSetup
     int AudioDelay;
     int AudioDownmix;
     int OsdSize;
+    int CecEnabled;
     int RemoteProtocol;
     int RemoteAddress;
 };

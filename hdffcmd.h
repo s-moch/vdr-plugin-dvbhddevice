@@ -39,7 +39,7 @@ public:
     void CmdAvShowStillImage(uint8_t DecoderIndex, const uint8_t * pStillImage, int Size, eVideoStreamType StreamType);
     void CmdAvSetDecoderInput(uint8_t DecoderIndex, uint8_t DemultiplexerIndex);
     void CmdAvSetDemultiplexerInput(uint8_t DemultiplexerIndex, uint8_t TsInputIndex);
-    void CmdAvSetVideoFormat(uint8_t DecoderIndex, tVideoFormat * pVideoFormat);
+    void CmdAvSetVideoFormat(uint8_t DecoderIndex, const tVideoFormat * pVideoFormat);
     void CmdAvSetVideoOutputMode(uint8_t DecoderIndex, eVideoOutputMode OutputMode);
     void CmdAvSetStc(uint8_t DecoderIndex, uint64_t Stc);
     void CmdAvFlushBuffer(uint8_t DecoderIndex, bool FlushAudio, bool FlushVideo);
@@ -51,7 +51,7 @@ public:
     void CmdAvSetAudioDownmix(eDownmixMode DownmixMode);
     void CmdAvSetAudioChannel(uint8_t AudioChannel);
 
-    void CmdOsdConfigure(tOsdConfig * pConfig);
+    void CmdOsdConfigure(const tOsdConfig * pConfig);
     void CmdOsdReset(void);
 
     uint32_t CmdOsdCreateDisplay(uint32_t Width, uint32_t Height, eColorType ColorType);
@@ -85,6 +85,8 @@ public:
     void CmdMuxMuteAudio(bool Mute);
 
     void CmdHdmiSetVideoMode(eHdmiVideoMode VideoMode);
+    void CmdHdmiConfigure(const tHdmiConfig * pConfig);
+    void CmdHdmiSendCecCommand(eCecCommand Command);
 
     void CmdRemoteSetProtocol(eRemoteProtocol Protocol);
     void CmdRemoteSetAddressFilter(bool Enable, uint32_t Address);

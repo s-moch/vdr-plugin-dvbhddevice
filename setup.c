@@ -97,6 +97,7 @@ cHdffSetup::cHdffSetup(void)
     AudioDelay = 0;
     AudioDownmix = HDFF::downmixAutomatic;
     OsdSize = 0;
+    CecEnabled = 1;
     RemoteProtocol = 1;
     RemoteAddress = -1;
 }
@@ -110,6 +111,7 @@ bool cHdffSetup::SetupParse(const char *Name, const char *Value)
     else if (strcmp(Name, "AudioDelay")      == 0) AudioDelay      = atoi(Value);
     else if (strcmp(Name, "AudioDownmix")    == 0) AudioDownmix    = atoi(Value);
     else if (strcmp(Name, "OsdSize")         == 0) OsdSize         = atoi(Value);
+    else if (strcmp(Name, "CecEnabled")      == 0) CecEnabled      = atoi(Value);
     else if (strcmp(Name, "RemoteProtocol")  == 0) RemoteProtocol  = atoi(Value);
     else if (strcmp(Name, "RemoteAddress")   == 0) RemoteAddress   = atoi(Value);
     else return false;
@@ -186,6 +188,7 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     Add(new cMenuEditIntItem("Audio Delay (ms)", &mNewHdffSetup.AudioDelay, 0, 500));
     Add(new cMenuEditStraItem("Audio Downmix", &mNewHdffSetup.AudioDownmix, kAudioDownmixes, AudioDownmixItems));
     Add(new cMenuEditStraItem("Osd Size", &mNewHdffSetup.OsdSize, kOsdSizes, OsdSizeItems));
+    Add(new cMenuEditBoolItem("HDMI CEC", &mNewHdffSetup.CecEnabled));
     Add(new cMenuEditStraItem("Remote Control Protocol", &mNewHdffSetup.RemoteProtocol, kRemoteProtocols, RemoteProtocolItems));
     Add(new cMenuEditIntItem("Remote Control Address", &mNewHdffSetup.RemoteAddress, -1, 31));
 }
@@ -203,6 +206,7 @@ void cHdffSetupPage::Store(void)
     SetupStore("AudioDelay", mNewHdffSetup.AudioDelay);
     SetupStore("AudioDownmix", mNewHdffSetup.AudioDownmix);
     SetupStore("OsdSize", mNewHdffSetup.OsdSize);
+    SetupStore("CecEnabled", mNewHdffSetup.CecEnabled);
     SetupStore("RemoteProtocol", mNewHdffSetup.RemoteProtocol);
     SetupStore("RemoteAddress", mNewHdffSetup.RemoteAddress);
 
@@ -213,6 +217,7 @@ void cHdffSetupPage::Store(void)
             mHdffCmdIf->CmdHdmiSetVideoMode(mNewHdffSetup.GetVideoMode());
         }
         HDFF::tVideoFormat videoFormat;
+        HDFF::tHdmiConfig hdmiConfig;
 
         videoFormat.AutomaticEnabled = true;
         videoFormat.AfdEnabled = true;
@@ -225,9 +230,13 @@ void cHdffSetupPage::Store(void)
 
         mHdffCmdIf->CmdMuxSetVideoOut((HDFF::eVideoOut) mNewHdffSetup.AnalogueVideo);
 
+        hdmiConfig.TransmitAudio = true;
+        hdmiConfig.ForceDviMode = false;
+        hdmiConfig.CecEnabled = mNewHdffSetup.CecEnabled;
+        mHdffCmdIf->CmdHdmiConfigure(&hdmiConfig);
+
         mHdffCmdIf->CmdRemoteSetProtocol((HDFF::eRemoteProtocol) mNewHdffSetup.RemoteProtocol);
         mHdffCmdIf->CmdRemoteSetAddressFilter(mNewHdffSetup.RemoteAddress >= 0, mNewHdffSetup.RemoteAddress);
-
     }
 
     gHdffSetup = mNewHdffSetup;

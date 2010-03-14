@@ -270,7 +270,7 @@ void cHdffCmdIf::CmdAvSetDemultiplexerInput(uint8_t DemultiplexerIndex, uint8_t 
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }
 
-void cHdffCmdIf::CmdAvSetVideoFormat(uint8_t DecoderIndex, tVideoFormat * pVideoFormat)
+void cHdffCmdIf::CmdAvSetVideoFormat(uint8_t DecoderIndex, const tVideoFormat * pVideoFormat)
 {
     cBitBuffer cmdBuf(MAX_CMD_LEN);
     osd_raw_cmd_t osd_cmd;
@@ -473,7 +473,7 @@ void cHdffCmdIf::CmdAvSetAudioChannel(uint8_t AudioChannel)
 }
 
 
-void cHdffCmdIf::CmdOsdConfigure(tOsdConfig * pConfig)
+void cHdffCmdIf::CmdOsdConfigure(const tOsdConfig * pConfig)
 {
     cBitBuffer cmdBuf(MAX_CMD_LEN);
     osd_raw_cmd_t osd_cmd;
@@ -987,6 +987,55 @@ void cHdffCmdIf::CmdHdmiSetVideoMode(eHdmiVideoMode VideoMode)
     osd_cmd.cmd_data = cmdBuf.GetData();
     CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupHdmi, msgHdmiSetVideoMode);
     cmdBuf.SetBits(8, VideoMode);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
+void cHdffCmdIf::CmdHdmiConfigure(const tHdmiConfig * pConfig)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupHdmi, msgHdmiConfigure);
+    if (pConfig->TransmitAudio)
+    {
+        cmdBuf.SetBits(1, 1);
+    }
+    else
+    {
+        cmdBuf.SetBits(1, 0);
+    }
+    if (pConfig->ForceDviMode)
+    {
+        cmdBuf.SetBits(1, 1);
+    }
+    else
+    {
+        cmdBuf.SetBits(1, 0);
+    }
+    if (pConfig->CecEnabled)
+    {
+        cmdBuf.SetBits(1, 1);
+    }
+    else
+    {
+        cmdBuf.SetBits(1, 0);
+    }
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
+void cHdffCmdIf::CmdHdmiSendCecCommand(eCecCommand Command)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupHdmi, msgHdmiSendCecCommand);
+    cmdBuf.SetBits(8, Command);
     osd_cmd.cmd_len = CmdSetLength(cmdBuf);
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }

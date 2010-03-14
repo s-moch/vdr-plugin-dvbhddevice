@@ -95,9 +95,11 @@ typedef enum _eMessageId
 
     msgHdmiEnableOutput = 0,
     msgHdmiSetVideoMode,
-    msgHdmiConfigureOutput,
+    msgHdmiConfigure,
     msgHdmiIsDisplayConnected,
     msgHdmiGetDisplayInfo,
+    msgHdmiGetVideoMode,
+    msgHdmiSendCecCommand,
 
     msgRemoteSetProtocol = 0,
     msgRemoteSetAddressFilter,
@@ -262,6 +264,20 @@ typedef enum _eHdmiVideoMode
     videoModeMaxValue
 } eHdmiVideoMode;
 
+typedef enum _eCecCommand
+{
+    cecCommandTvOn,
+    cecCommandTvOff,
+    cecCommandActiveSource,
+    cecCommandInactiveSource
+} eCecCommand;
+
+typedef struct _tHdmiConfig
+{
+    bool TransmitAudio;
+    bool ForceDviMode;
+    bool CecEnabled;
+} tHdmiConfig;
 
 // Remote control definitions
 
