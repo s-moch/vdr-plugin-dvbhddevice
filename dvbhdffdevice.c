@@ -311,7 +311,7 @@ void cDvbHdFfDevice::SetDigitalAudioDevice(bool On)
 
 void cDvbHdFfDevice::SetAudioTrackDevice(eTrackType Type)
 {
-  printf("SetAudioTrackDevice %d\n", Type);
+  //printf("SetAudioTrackDevice %d\n", Type);
   const tTrackId *TrackId = GetTrack(Type);
   if (TrackId && TrackId->id) {
      if (IS_AUDIO_TRACK(Type)) {

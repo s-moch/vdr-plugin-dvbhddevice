@@ -20,7 +20,9 @@ cHdffCmdIf::cHdffCmdIf(int OsdDev)
 {
     mOsdDev = OsdDev;
     if (mOsdDev < 0)
-        printf("ERROR: invalid OSD device handle (%d)!\n", mOsdDev);
+    {
+        //printf("ERROR: invalid OSD device handle (%d)!\n", mOsdDev);
+    }
 }
 
 cHdffCmdIf::~cHdffCmdIf(void)
@@ -136,7 +138,7 @@ uint32_t cHdffCmdIf::CmdGetCopyrights(uint8_t Index, char * pString, uint32_t Ma
 
 void cHdffCmdIf::CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVideoStreamType StreamType)
 {
-    printf("SetVideoPid %d %d\n", VideoPid, StreamType);
+    //printf("SetVideoPid %d %d\n", VideoPid, StreamType);
     cBitBuffer cmdBuf(MAX_CMD_LEN);
     osd_raw_cmd_t osd_cmd;
 
@@ -152,7 +154,7 @@ void cHdffCmdIf::CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVide
 
 void cHdffCmdIf::CmdAvSetAudioPid(uint8_t DecoderIndex, uint16_t AudioPid, eAudioStreamType StreamType)
 {
-    printf("SetAudioPid %d %d\n", AudioPid, StreamType);
+    //printf("SetAudioPid %d %d\n", AudioPid, StreamType);
     cBitBuffer cmdBuf(MAX_CMD_LEN);
     osd_raw_cmd_t osd_cmd;
 
@@ -168,7 +170,7 @@ void cHdffCmdIf::CmdAvSetAudioPid(uint8_t DecoderIndex, uint16_t AudioPid, eAudi
 
 void cHdffCmdIf::CmdAvSetPcrPid(uint8_t DecoderIndex, uint16_t PcrPid)
 {
-    printf("SetPcrPid %d\n", PcrPid);
+    //printf("SetPcrPid %d\n", PcrPid);
     cBitBuffer cmdBuf(MAX_CMD_LEN);
     osd_raw_cmd_t osd_cmd;
 
