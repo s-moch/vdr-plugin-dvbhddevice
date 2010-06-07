@@ -100,6 +100,7 @@ cHdffSetup::cHdffSetup(void)
     CecEnabled = 1;
     RemoteProtocol = 1;
     RemoteAddress = -1;
+    HighLevelOsd = 1;
 }
 
 bool cHdffSetup::SetupParse(const char *Name, const char *Value)
@@ -114,6 +115,7 @@ bool cHdffSetup::SetupParse(const char *Name, const char *Value)
     else if (strcmp(Name, "CecEnabled")      == 0) CecEnabled      = atoi(Value);
     else if (strcmp(Name, "RemoteProtocol")  == 0) RemoteProtocol  = atoi(Value);
     else if (strcmp(Name, "RemoteAddress")   == 0) RemoteAddress   = atoi(Value);
+    else if (strcmp(Name, "HighLevelOsd")    == 0) HighLevelOsd    = atoi(Value);
     else return false;
     return true;
 }
@@ -191,6 +193,7 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     Add(new cMenuEditBoolItem("HDMI CEC", &mNewHdffSetup.CecEnabled));
     Add(new cMenuEditStraItem("Remote Control Protocol", &mNewHdffSetup.RemoteProtocol, kRemoteProtocols, RemoteProtocolItems));
     Add(new cMenuEditIntItem("Remote Control Address", &mNewHdffSetup.RemoteAddress, -1, 31));
+    Add(new cMenuEditBoolItem("High Level OSD", &mNewHdffSetup.HighLevelOsd));
 }
 
 cHdffSetupPage::~cHdffSetupPage(void)
@@ -209,6 +212,7 @@ void cHdffSetupPage::Store(void)
     SetupStore("CecEnabled", mNewHdffSetup.CecEnabled);
     SetupStore("RemoteProtocol", mNewHdffSetup.RemoteProtocol);
     SetupStore("RemoteAddress", mNewHdffSetup.RemoteAddress);
+    SetupStore("HighLevelOsd", mNewHdffSetup.HighLevelOsd);
 
     if (mHdffCmdIf)
     {

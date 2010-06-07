@@ -29,6 +29,8 @@ struct cHdffSetup
     int CecEnabled;
     int RemoteProtocol;
     int RemoteAddress;
+
+    int HighLevelOsd;
 };
 
 extern cHdffSetup gHdffSetup;
