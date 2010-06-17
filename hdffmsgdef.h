@@ -117,6 +117,7 @@ typedef enum _eAudioStreamType
     audioStreamAac,
     audioStreamHeAac,
     audioStreamPcm,
+    audioStreamEAc3,
     audioStreamMaxValue
 } eAudioStreamType;
 

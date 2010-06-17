@@ -19,6 +19,7 @@
 #include "setup.h"
 #include "vdr/eitscan.h"
 #include "vdr/transfer.h"
+#include "libsi/si.h"
 
 // --- cDvbHdFfDevice ----------------------------------------------------------
 
@@ -611,7 +612,7 @@ int cDvbHdFfDevice::PlayAudio(const uchar *Data, int Length, uchar Id)
     uint8_t streamId;
     uint8_t tsBuffer[188 * 16];
     uint32_t tsLength;
-    HDFF::eAudioStreamType streamType;
+    HDFF::eAudioStreamType streamType = HDFF::audioStreamMpeg1;
     int pid;
 
     streamId = Data[3];
@@ -655,7 +656,10 @@ static HDFF::eAudioStreamType MapAudioStreamTypes(int Atype)
   switch (Atype) {
     case 0x03: return HDFF::audioStreamMpeg1;
     case 0x04: return HDFF::audioStreamMpeg2;
-    case 0x06: return HDFF::audioStreamAc3;
+    case SI::AC3DescriptorTag: return HDFF::audioStreamAc3;
+    case SI::EnhancedAC3DescriptorTag: return HDFF::audioStreamEAc3;
+    case 0x0F: return HDFF::audioStreamAac;
+    case 0x11: return HDFF::audioStreamHeAac;
     default: return HDFF::audioStreamMaxValue; // there is no HDFF::audioStreamNone
     }
 }
