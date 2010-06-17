@@ -162,10 +162,16 @@ void cHdffOsd::SetActive(bool On)
 
 void cHdffOsd::SaveRegion(int x1, int y1, int x2, int y2)
 {
+    mHdffCmdIf->CmdOsdSaveRegion(mDisplay, mLeft + x1, mTop + y1, x2 - x1 + 1, y2 - y1 + 1);
+    mChanged = true;
+    mBitmapModified = false;
 }
 
 void cHdffOsd::RestoreRegion(void)
 {
+    mHdffCmdIf->CmdOsdRestoreRegion(mDisplay);
+    mChanged = true;
+    mBitmapModified = false;
 }
 
 void cHdffOsd::DrawPixel(int x, int y, tColor Color)

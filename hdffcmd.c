@@ -936,6 +936,36 @@ void cHdffCmdIf::CmdOsdDrawBitmap(uint32_t hDisplay, int X, int Y,
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }
 
+void cHdffCmdIf::CmdOsdSaveRegion(uint32_t hDisplay, int X, int Y, int Width, int Height)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupOsd, msgOsdSaveRegion);
+    cmdBuf.SetBits(32, hDisplay);
+    cmdBuf.SetBits(16, X);
+    cmdBuf.SetBits(16, Y);
+    cmdBuf.SetBits(16, Width);
+    cmdBuf.SetBits(16, Height);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
+void cHdffCmdIf::CmdOsdRestoreRegion(uint32_t hDisplay)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupOsd, msgOsdRestoreRegion);
+    cmdBuf.SetBits(32, hDisplay);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
 void cHdffCmdIf::CmdMuxSetVideoOut(eVideoOut VideoOut)
 {
     cBitBuffer cmdBuf(MAX_CMD_LEN);

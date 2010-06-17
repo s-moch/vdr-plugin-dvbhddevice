@@ -79,6 +79,8 @@ public:
     void CmdOsdDrawBitmap(uint32_t hDisplay, int X, int Y,
                           uint8_t * pBitmap, int BmpWidth, int BmpHeight, int BmpSize,
                           eColorType ColorType, uint32_t hPalette);
+    void CmdOsdSaveRegion(uint32_t hDisplay, int X, int Y, int Width, int Height);
+    void CmdOsdRestoreRegion(uint32_t hDisplay);
 
     void CmdMuxSetVideoOut(eVideoOut VideoOut);
     void CmdMuxSetVolume(uint8_t Volume);
