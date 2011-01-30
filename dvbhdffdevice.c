@@ -644,9 +644,11 @@ int cDvbHdFfDevice::PlayTsVideo(const uchar *Data, int Length)
 {
   int pid = TsPid(Data);
   if (pid != playVideoPid) {
-     playVideoPid = pid;
      PatPmtParser();
-     mHdffCmdIf->CmdAvSetVideoPid(0, playVideoPid, MapVideoStreamTypes(PatPmtParser()->Vtype()), true);
+     if (pid == PatPmtParser()->Vpid()) {
+        playVideoPid = pid;
+        mHdffCmdIf->CmdAvSetVideoPid(0, playVideoPid, MapVideoStreamTypes(PatPmtParser()->Vtype()), true);
+        }
      }
   return WriteAllOrNothing(fd_video, Data, Length, 1000, 10);
 }
