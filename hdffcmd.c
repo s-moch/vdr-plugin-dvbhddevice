@@ -136,7 +136,7 @@ uint32_t cHdffCmdIf::CmdGetCopyrights(uint8_t Index, char * pString, uint32_t Ma
 }
 
 
-void cHdffCmdIf::CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVideoStreamType StreamType)
+void cHdffCmdIf::CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVideoStreamType StreamType, bool PlaybackMode)
 {
     //printf("SetVideoPid %d %d\n", VideoPid, StreamType);
     cBitBuffer cmdBuf(MAX_CMD_LEN);
@@ -147,7 +147,8 @@ void cHdffCmdIf::CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVide
     CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetVideoPid);
     cmdBuf.SetBits(4, DecoderIndex);
     cmdBuf.SetBits(4, StreamType);
-    cmdBuf.SetBits(16, VideoPid);
+    cmdBuf.SetBits(1, PlaybackMode ? 1 : 0);
+    cmdBuf.SetBits(15, VideoPid);
     osd_cmd.cmd_len = CmdSetLength(cmdBuf);
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }

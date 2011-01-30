@@ -600,7 +600,7 @@ int cDvbHdFfDevice::PlayVideo(const uchar *Data, int Length)
 
     if (pid != playVideoPid) {
         playVideoPid = pid;
-        mHdffCmdIf->CmdAvSetVideoPid(0, playVideoPid, HDFF::videoStreamMpeg2);
+        mHdffCmdIf->CmdAvSetVideoPid(0, playVideoPid, HDFF::videoStreamMpeg2, true);
     }
     if (WriteAllOrNothing(fd_video, tsBuffer, tsLength, 1000, 10) <= 0)
         Length = 0;
@@ -646,7 +646,7 @@ int cDvbHdFfDevice::PlayTsVideo(const uchar *Data, int Length)
   if (pid != playVideoPid) {
      playVideoPid = pid;
      PatPmtParser();
-     mHdffCmdIf->CmdAvSetVideoPid(0, playVideoPid, MapVideoStreamTypes(PatPmtParser()->Vtype()));
+     mHdffCmdIf->CmdAvSetVideoPid(0, playVideoPid, MapVideoStreamTypes(PatPmtParser()->Vtype()), true);
      }
   return WriteAllOrNothing(fd_video, Data, Length, 1000, 10);
 }
