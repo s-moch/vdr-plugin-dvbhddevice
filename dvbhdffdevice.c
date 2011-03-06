@@ -356,7 +356,7 @@ bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
      mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF::audioStreamMpeg1);
 
      ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_DEMUX);
-     mHdffCmdIf->CmdAvSetDemultiplexerInput(0, 0);
+     mHdffCmdIf->CmdAvSetDecoderInput(0, 0);
      mHdffCmdIf->CmdAvEnableSync(0, true);
      }
   else {
@@ -372,7 +372,7 @@ bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
      audioCounter = 0;
      videoCounter = 0;
 
-     mHdffCmdIf->CmdAvSetDemultiplexerInput(0, 2);
+     mHdffCmdIf->CmdAvSetDecoderInput(0, 2);
      ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_MEMORY);
      }
   playMode = PlayMode;
