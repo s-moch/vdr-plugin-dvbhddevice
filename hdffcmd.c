@@ -136,6 +136,20 @@ uint32_t cHdffCmdIf::CmdGetCopyrights(uint8_t Index, char * pString, uint32_t Ma
 }
 
 
+void cHdffCmdIf::CmdAvSetPlayMode(uint8_t PlayMode, bool Realtime)
+{
+    cBitBuffer cmdBuf(MAX_CMD_LEN);
+    osd_raw_cmd_t osd_cmd;
+
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdBuf.GetData();
+    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetPlayMode);
+    cmdBuf.SetBits(1, Realtime ? 1 : 0);
+    cmdBuf.SetBits(7, PlayMode);
+    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
+    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+}
+
 void cHdffCmdIf::CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVideoStreamType StreamType, bool PlaybackMode)
 {
     //printf("SetVideoPid %d %d\n", VideoPid, StreamType);

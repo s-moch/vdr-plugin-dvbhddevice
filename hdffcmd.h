@@ -31,6 +31,7 @@ public:
     uint32_t CmdGetInterfaceVersion(char * pString, uint32_t MaxLength);
     uint32_t CmdGetCopyrights(uint8_t Index, char * pString, uint32_t MaxLength);
 
+    void CmdAvSetPlayMode(uint8_t PlayMode, bool Realtime);
     void CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVideoStreamType StreamType, bool PlaybackMode = false);
     void CmdAvSetAudioPid(uint8_t DecoderIndex, uint16_t AudioPid, eAudioStreamType StreamType);
     void CmdAvSetPcrPid(uint8_t DecoderIndex, uint16_t PcrPid);
