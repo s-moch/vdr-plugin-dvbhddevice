@@ -358,11 +358,13 @@ bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
      ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_DEMUX);
      mHdffCmdIf->CmdAvSetDecoderInput(0, 0);
      mHdffCmdIf->CmdAvEnableSync(0, true);
+     mHdffCmdIf->CmdAvSetPlayMode(0, true);
      }
   else {
      if (playMode == pmNone)
         TurnOffLiveMode(true);
 
+     mHdffCmdIf->CmdAvSetPlayMode(1, Transferring());
      mHdffCmdIf->CmdAvSetStc(0, 100000);
      mHdffCmdIf->CmdAvEnableSync(0, true);
      mHdffCmdIf->CmdAvEnableVideoAfterStop(0, true);
