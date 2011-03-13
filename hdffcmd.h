@@ -62,12 +62,14 @@ public:
     void CmdOsdSetDisplayClippingArea(uint32_t hDisplay, bool Enable, uint32_t X, uint32_t Y, uint32_t Width, uint32_t Height);
     void CmdOsdRenderDisplay(uint32_t hDisplay);
 
-    uint32_t CmdOsdCreatePalette(eColorType ColorType, eColorFormat ColorFormat, uint32_t NumColors, uint32_t * pColors);
+    uint32_t CmdOsdCreatePalette(eColorType ColorType, eColorFormat ColorFormat,
+                                 uint32_t NumColors, const uint32_t * pColors);
     void CmdOsdDeletePalette(uint32_t hPalette);
     void CmdOsdSetDisplayPalette(uint32_t hDisplay, uint32_t hPalette);
-    void CmdOsdSetPaletteColors(uint32_t hPalette, eColorFormat ColorFormat, uint8_t StartColor, uint32_t NumColors, uint32_t * pColors);
+    void CmdOsdSetPaletteColors(uint32_t hPalette, eColorFormat ColorFormat,
+                                uint8_t StartColor, uint32_t NumColors, const uint32_t * pColors);
 
-    uint32_t CmdOsdCreateFontFace(uint8_t * pFontData, uint32_t DataSize);
+    uint32_t CmdOsdCreateFontFace(const uint8_t * pFontData, uint32_t DataSize);
     void CmdOsdDeleteFontFace(uint32_t hFontFace);
     uint32_t CmdOsdCreateFont(uint32_t hFontFace, uint32_t Size);
     void CmdOsdDeleteFont(uint32_t hFont);
@@ -77,8 +79,8 @@ public:
                            uint32_t Color, uint32_t Flags);
     void CmdOsdDrawText(uint32_t hDisplay, uint32_t hFont, int X, int Y, const char * pText, uint32_t Color);
     void CmdOsdDrawTextW(uint32_t hDisplay, uint32_t hFont, int X, int Y, const uint16_t * pText, uint32_t Color);
-    void CmdOsdDrawBitmap(uint32_t hDisplay, int X, int Y,
-                          uint8_t * pBitmap, int BmpWidth, int BmpHeight, int BmpSize,
+    void CmdOsdDrawBitmap(uint32_t hDisplay, int X, int Y, const uint8_t * pBitmap,
+                          int BmpWidth, int BmpHeight, int BmpSize,
                           eColorType ColorType, uint32_t hPalette);
     void CmdOsdSaveRegion(uint32_t hDisplay, int X, int Y, int Width, int Height);
     void CmdOsdRestoreRegion(uint32_t hDisplay);

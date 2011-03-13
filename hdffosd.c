@@ -705,7 +705,7 @@ cOsd *cHdffOsdProvider::CreateOsd(int Left, int Top, uint Level)
 {
     //printf("CreateOsd %d %d %d\n", Left, Top, Level);
     if (gHdffSetup.HighLevelOsd)
-	return new cHdffOsd(Left, Top, mHdffCmdIf, Level);
+        return new cHdffOsd(Left, Top, mHdffCmdIf, Level);
     else
-	return new cHdffOsdRaw(Left, Top, mHdffCmdIf, Level);
+        return new cHdffOsdRaw(Left, Top, mHdffCmdIf, Level);
 }
