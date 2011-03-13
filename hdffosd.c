@@ -54,7 +54,7 @@ public:
     cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level);
     virtual ~cHdffOsd();
     cBitmap *GetBitmap(int Area);
-    //virtual eOsdError CanHandleAreas(const tArea *Areas, int NumAreas);
+    virtual eOsdError CanHandleAreas(const tArea *Areas, int NumAreas);
     virtual eOsdError SetAreas(const tArea *Areas, int NumAreas);
     virtual void SaveRegion(int x1, int y1, int x2, int y2);
     virtual void RestoreRegion(void);
@@ -132,6 +132,20 @@ cBitmap * cHdffOsd::GetBitmap(int Area)
     mChanged = true;
     mBitmapModified = true;
     return cOsd::GetBitmap(Area);
+}
+
+eOsdError cHdffOsd::CanHandleAreas(const tArea *Areas, int NumAreas)
+{
+    eOsdError Result = cOsd::CanHandleAreas(Areas, NumAreas);
+    if (Result == oeOk)
+    {
+        for (int i = 0; i < NumAreas; i++)
+        {
+            if (Areas[i].bpp != 1 && Areas[i].bpp != 2 && Areas[i].bpp != 4 && Areas[i].bpp != 8)
+                return oeBppNotSupported;
+        }
+    }
+    return Result;
 }
 
 eOsdError cHdffOsd::SetAreas(const tArea *Areas, int NumAreas)
@@ -541,7 +555,7 @@ protected:
 public:
     cHdffOsdRaw(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level);
     virtual ~cHdffOsdRaw();
-    //virtual eOsdError CanHandleAreas(const tArea *Areas, int NumAreas);
+    virtual eOsdError CanHandleAreas(const tArea *Areas, int NumAreas);
     virtual eOsdError SetAreas(const tArea *Areas, int NumAreas);
     virtual void Flush(void);
 };
@@ -586,6 +600,20 @@ void cHdffOsdRaw::SetActive(bool On)
             shown = false;
         }
     }
+}
+
+eOsdError cHdffOsdRaw::CanHandleAreas(const tArea *Areas, int NumAreas)
+{
+    eOsdError Result = cOsd::CanHandleAreas(Areas, NumAreas);
+    if (Result == oeOk)
+    {
+        for (int i = 0; i < NumAreas; i++)
+        {
+            if (Areas[i].bpp != 1 && Areas[i].bpp != 2 && Areas[i].bpp != 4 && Areas[i].bpp != 8)
+                return oeBppNotSupported;
+        }
+    }
+    return Result;
 }
 
 eOsdError cHdffOsdRaw::SetAreas(const tArea *Areas, int NumAreas)
