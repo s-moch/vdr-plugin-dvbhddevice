@@ -660,9 +660,9 @@ void cHdffOsdRaw::Flush(void)
             const tColor * colors = bitmap->Colors(numColors);
             if (colors)
             {
-                for (i = 0; i < numColors; i++)
+                for (int c = 0; c < numColors; c++)
                 {
-                    mBitmapColors[i] = colors[i];
+                    mBitmapColors[c] = colors[c];
                 }
                 if (mBitmapPalette == InvalidHandle)
                 {
