@@ -33,7 +33,7 @@ public:
 
     void CmdAvSetPlayMode(uint8_t PlayMode, bool Realtime);
     void CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVideoStreamType StreamType, bool PlaybackMode = false);
-    void CmdAvSetAudioPid(uint8_t DecoderIndex, uint16_t AudioPid, eAudioStreamType StreamType);
+    void CmdAvSetAudioPid(uint8_t DecoderIndex, uint16_t AudioPid, eAudioStreamType StreamType, eAVContainerType ContainerType = avContainerPes);
     void CmdAvSetPcrPid(uint8_t DecoderIndex, uint16_t PcrPid);
     void CmdAvSetTeletextPid(uint8_t DecoderIndex, uint16_t TeletextPid);
     void CmdAvSetVideoWindow(uint8_t DecoderIndex, bool Enable, uint16_t X, uint16_t Y, uint16_t Width, uint16_t Height);

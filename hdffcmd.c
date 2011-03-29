@@ -167,9 +167,9 @@ void cHdffCmdIf::CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVide
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }
 
-void cHdffCmdIf::CmdAvSetAudioPid(uint8_t DecoderIndex, uint16_t AudioPid, eAudioStreamType StreamType)
+void cHdffCmdIf::CmdAvSetAudioPid(uint8_t DecoderIndex, uint16_t AudioPid, eAudioStreamType StreamType, eAVContainerType ContainerType)
 {
-    //printf("SetAudioPid %d %d\n", AudioPid, StreamType);
+    //printf("SetAudioPid %d %d %d\n", AudioPid, StreamType, ContainerType);
     cBitBuffer cmdBuf(MAX_CMD_LEN);
     osd_raw_cmd_t osd_cmd;
 
@@ -178,7 +178,9 @@ void cHdffCmdIf::CmdAvSetAudioPid(uint8_t DecoderIndex, uint16_t AudioPid, eAudi
     CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetAudioPid);
     cmdBuf.SetBits(4, DecoderIndex);
     cmdBuf.SetBits(4, StreamType);
-    cmdBuf.SetBits(16, AudioPid);
+    cmdBuf.SetBits(2, 0); // reserved
+    cmdBuf.SetBits(1, ContainerType);
+    cmdBuf.SetBits(13, AudioPid);
     osd_cmd.cmd_len = CmdSetLength(cmdBuf);
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }

@@ -110,6 +110,13 @@ typedef enum _eMessageId
 
 // AvDec definitions
 
+typedef enum _eAVContainerType
+{
+    avContainerPes,
+    avContainerPesDvd,
+    avContainerMaxValue
+} eAVContainerType;
+
 typedef enum _eAudioStreamType
 {
     audioStreamMpeg1,
@@ -119,6 +126,7 @@ typedef enum _eAudioStreamType
     audioStreamHeAac,
     audioStreamPcm,
     audioStreamEAc3,
+    audioStreamDts,
     audioStreamMaxValue
 } eAudioStreamType;
 
