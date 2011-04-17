@@ -9,17 +9,17 @@
 #include "dvbhdffdevice.h"
 #include <errno.h>
 #include <limits.h>
+#include <libsi/si.h>
 #include <linux/videodev2.h>
 #include <linux/dvb/audio.h>
 #include <linux/dvb/dmx.h>
 #include <linux/dvb/video.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <vdr/eitscan.h>
+#include <vdr/transfer.h>
 #include "hdffosd.h"
 #include "setup.h"
-#include "vdr/eitscan.h"
-#include "vdr/transfer.h"
-#include "libsi/si.h"
 
 // --- cDvbHdFfDevice ----------------------------------------------------------
 
