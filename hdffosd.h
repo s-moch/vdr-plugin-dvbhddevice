@@ -20,6 +20,7 @@ private:
 public:
     cHdffOsdProvider(HDFF::cHdffCmdIf * pHdffCmdIf);
     virtual cOsd *CreateOsd(int Left, int Top, uint Level);
+    virtual bool ProvidesTrueColor(void);
 };
 
 #endif

@@ -609,7 +609,7 @@ eOsdError cHdffOsdRaw::CanHandleAreas(const tArea *Areas, int NumAreas)
     {
         for (int i = 0; i < NumAreas; i++)
         {
-            if (Areas[i].bpp != 1 && Areas[i].bpp != 2 && Areas[i].bpp != 4 && Areas[i].bpp != 8)
+            if (Areas[i].bpp != 1 && Areas[i].bpp != 2 && Areas[i].bpp != 4 && Areas[i].bpp != 8 && Areas[i].bpp != 32)
                 return oeBppNotSupported;
         }
     }
@@ -631,94 +631,104 @@ void cHdffOsdRaw::Flush(void)
 {
     if (!Active())
         return;
-    int i;
-    cBitmap * bitmap;
-    uint8_t * buffer;
-    struct timeval start;
-    struct timeval end;
-    struct timezone timeZone;
+    //struct timeval start;
+    //struct timeval end;
+    //struct timezone timeZone;
+    //gettimeofday(&start, &timeZone);
+
     bool render = false;
-
-    buffer = new uint8_t[MAX_BITMAP_SIZE];
-    if (!buffer)
-        return;
-
-    gettimeofday(&start, &timeZone);
-    for (i = 0; (bitmap = GetBitmap(i)) != NULL; i++)
+    if (IsTrueColor())
     {
-        int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-        if (!shown || bitmap->Dirty(x1, y1, x2, y2))
+        LOCK_PIXMAPS;
+        while (cPixmapMemory *pm = RenderPixmaps())
         {
-            if (!shown)
+            int w = pm->ViewPort().Width();
+            int h = pm->ViewPort().Height();
+            int d = w * sizeof(tColor);
+            int Chunk = MAX_BITMAP_SIZE / w / sizeof(tColor);
+            if (Chunk > h)
+                Chunk = h;
+            for (int y = 0; y < h; y += Chunk)
             {
-                x1 = y1 = 0;
-                x2 = bitmap->Width() - 1;
-                y2 = bitmap->Height() - 1;
+                 int hc = Chunk;
+                 if (y + hc > h)
+                     hc = h - y;
+                 mHdffCmdIf->CmdOsdDrawBitmap(mDisplay,
+                     Left() + pm->ViewPort().X(), Top() + pm->ViewPort().Y() + y,
+                     pm->Data() + y * d, w, hc, hc * d,
+                     HDFF::colorTypeARGB8888, InvalidHandle);
             }
-            // commit colors:
-            int numColors;
-            const tColor * colors = bitmap->Colors(numColors);
-            if (colors)
-            {
-                for (int c = 0; c < numColors; c++)
-                {
-                    mBitmapColors[c] = colors[c];
-                }
-                if (mBitmapPalette == InvalidHandle)
-                {
-                    mBitmapPalette = mHdffCmdIf->CmdOsdCreatePalette(HDFF::colorTypeClut8,
-                        HDFF::colorFormatARGB, numColors, mBitmapColors);
-                }
-                else
-                {
-                    mHdffCmdIf->CmdOsdSetPaletteColors(mBitmapPalette,
-                        HDFF::colorFormatARGB, 0, numColors, mBitmapColors);
-                }
-            }
-            // commit modified data:
-            int y;
-            int size = 0;
-            int width = x2 - x1 + 1;
-            int height = 0;
-            for (y = y1; y <= y2; y++)
-            {
-                if (size + width > MAX_BITMAP_SIZE)
-                {
-                    mHdffCmdIf->CmdOsdDrawBitmap(mDisplay,
-                        Left() + bitmap->X0() + x1, Top() + bitmap->Y0() + y - height,
-                        buffer, width, height, size,
-                        HDFF::colorTypeClut8, mBitmapPalette);
-                    size = 0;
-                    height = 0;
-                }
-                memcpy(buffer + size, bitmap->Data(x1, y), width);
-                size += width;
-                height += 1;
-            }
-            if (size > 0)
-            {
-                mHdffCmdIf->CmdOsdDrawBitmap(mDisplay,
-                    Left() + bitmap->X0() + x1, Top() + bitmap->Y0() + y - height,
-                    buffer, width, height, size,
-                    HDFF::colorTypeClut8, mBitmapPalette);
-            }
+            delete pm;
             render = true;
         }
-        bitmap->Clean();
+    }
+    else
+    {
+        uint8_t * buffer = new uint8_t[MAX_BITMAP_SIZE];
+        if (!buffer)
+            return;
+        cBitmap * bitmap;
+        for (int i = 0; (bitmap = GetBitmap(i)) != NULL; i++)
+        {
+            int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+            if (!shown || bitmap->Dirty(x1, y1, x2, y2))
+            {
+                if (!shown)
+                {
+                    x2 = bitmap->Width() - 1;
+                    y2 = bitmap->Height() - 1;
+                }
+                // commit colors:
+                int numColors;
+                const tColor * colors = bitmap->Colors(numColors);
+                if (colors)
+                {
+                    for (int c = 0; c < numColors; c++)
+                        mBitmapColors[c] = colors[c];
+                    if (mBitmapPalette == InvalidHandle)
+                    {
+                        mBitmapPalette = mHdffCmdIf->CmdOsdCreatePalette(HDFF::colorTypeClut8,
+                            HDFF::colorFormatARGB, numColors, mBitmapColors);
+                    }
+                    else
+                    {
+                        mHdffCmdIf->CmdOsdSetPaletteColors(mBitmapPalette,
+                            HDFF::colorFormatARGB, 0, numColors, mBitmapColors);
+                    }
+                }
+                // commit modified data:
+                int width = x2 - x1 + 1;
+                int height = y2 - y1 + 1;
+                int chunk = MAX_BITMAP_SIZE / width;
+                if (chunk > height)
+                    chunk = height;
+                for (int y = 0; y < height; y += chunk)
+                {
+                    int hc = chunk;
+                    if (y + hc > height)
+                        hc = height - y;
+                    for (int r = 0; r < hc; r++)
+                        memcpy(buffer + r * width, bitmap->Data(x1, y1 + y + r), width);
+                    mHdffCmdIf->CmdOsdDrawBitmap(mDisplay,
+                        Left() + bitmap->X0() + x1, Top() + bitmap->Y0() + y1 + y,
+                        buffer, width, hc, hc * width,
+                        HDFF::colorTypeClut8, mBitmapPalette);
+                }
+                render = true;
+            }
+            bitmap->Clean();
+        }
+        delete[] buffer;
     }
     if (render)
     {
-        int timeNeeded;
-
         mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
-        gettimeofday(&end, &timeZone);
-        timeNeeded = end.tv_usec - start.tv_usec;
-        timeNeeded += (end.tv_sec - start.tv_sec) * 1000000;
+        //gettimeofday(&end, &timeZone);
+        //int timeNeeded = end.tv_usec - start.tv_usec;
+        //timeNeeded += (end.tv_sec - start.tv_sec) * 1000000;
         //printf("time = %d\n", timeNeeded);
     }
     shown = true;
-
-    delete[] buffer;
 }
 
 
@@ -736,4 +746,9 @@ cOsd *cHdffOsdProvider::CreateOsd(int Left, int Top, uint Level)
         return new cHdffOsd(Left, Top, mHdffCmdIf, Level);
     else
         return new cHdffOsdRaw(Left, Top, mHdffCmdIf, Level);
+}
+
+bool cHdffOsdProvider::ProvidesTrueColor(void)
+{
+    return !gHdffSetup.HighLevelOsd;
 }
