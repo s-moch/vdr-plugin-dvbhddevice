@@ -10,7 +10,7 @@
 #include "dvbhdffdevice.h"
 #include "setup.h"
 
-static const char *VERSION        = "0.0.2";
+static const char *VERSION        = "0.0.3";
 static const char *DESCRIPTION    = "HD Full Featured DVB device";
 
 class cPluginDvbhddevice : public cPlugin {
