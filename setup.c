@@ -162,6 +162,7 @@ void cHdffSetup::GetOsdSize(int &Width, int &Height, double &PixelAspect)
         Height = 576;
         PixelAspect = 4.0 / 3.0;
     }
+    PixelAspect /= double(Width) / Height;
 }
 
 HDFF::eHdmiVideoMode cHdffSetup::GetVideoMode(void)
