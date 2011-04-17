@@ -31,6 +31,7 @@ struct cHdffSetup
     int RemoteAddress;
 
     int HighLevelOsd;
+    int TrueColorOsd;
 };
 
 extern cHdffSetup gHdffSetup;

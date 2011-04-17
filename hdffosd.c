@@ -609,7 +609,8 @@ eOsdError cHdffOsdRaw::CanHandleAreas(const tArea *Areas, int NumAreas)
     {
         for (int i = 0; i < NumAreas; i++)
         {
-            if (Areas[i].bpp != 1 && Areas[i].bpp != 2 && Areas[i].bpp != 4 && Areas[i].bpp != 8 && Areas[i].bpp != 32)
+            if (Areas[i].bpp != 1 && Areas[i].bpp != 2 && Areas[i].bpp != 4 && Areas[i].bpp != 8
+                && (Areas[i].bpp != 32 || !gHdffSetup.TrueColorOsd))
                 return oeBppNotSupported;
         }
     }
@@ -750,5 +751,5 @@ cOsd *cHdffOsdProvider::CreateOsd(int Left, int Top, uint Level)
 
 bool cHdffOsdProvider::ProvidesTrueColor(void)
 {
-    return !gHdffSetup.HighLevelOsd;
+    return gHdffSetup.TrueColorOsd && !gHdffSetup.HighLevelOsd;
 }

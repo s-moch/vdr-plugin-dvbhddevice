@@ -101,6 +101,7 @@ cHdffSetup::cHdffSetup(void)
     RemoteProtocol = 1;
     RemoteAddress = -1;
     HighLevelOsd = 1;
+    TrueColorOsd = 1;
 }
 
 bool cHdffSetup::SetupParse(const char *Name, const char *Value)
@@ -116,6 +117,7 @@ bool cHdffSetup::SetupParse(const char *Name, const char *Value)
     else if (strcmp(Name, "RemoteProtocol")  == 0) RemoteProtocol  = atoi(Value);
     else if (strcmp(Name, "RemoteAddress")   == 0) RemoteAddress   = atoi(Value);
     else if (strcmp(Name, "HighLevelOsd")    == 0) HighLevelOsd    = atoi(Value);
+    else if (strcmp(Name, "TrueColorOsd")    == 0) TrueColorOsd    = atoi(Value);
     else return false;
     return true;
 }
@@ -194,6 +196,7 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     Add(new cMenuEditStraItem("Remote Control Protocol", &mNewHdffSetup.RemoteProtocol, kRemoteProtocols, RemoteProtocolItems));
     Add(new cMenuEditIntItem("Remote Control Address", &mNewHdffSetup.RemoteAddress, -1, 31));
     Add(new cMenuEditBoolItem("High Level OSD", &mNewHdffSetup.HighLevelOsd));
+    Add(new cMenuEditBoolItem("Allow True Color OSD", &mNewHdffSetup.TrueColorOsd));
 }
 
 cHdffSetupPage::~cHdffSetupPage(void)
@@ -213,6 +216,7 @@ void cHdffSetupPage::Store(void)
     SetupStore("RemoteProtocol", mNewHdffSetup.RemoteProtocol);
     SetupStore("RemoteAddress", mNewHdffSetup.RemoteAddress);
     SetupStore("HighLevelOsd", mNewHdffSetup.HighLevelOsd);
+    SetupStore("TrueColorOsd", mNewHdffSetup.TrueColorOsd);
 
     if (mHdffCmdIf)
     {
