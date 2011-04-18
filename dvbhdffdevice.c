@@ -725,7 +725,8 @@ HDFF::cHdffCmdIf *cDvbHdFfDevice::GetHdffCmdHandler(void)
 bool cDvbHdFfDeviceProbe::Probe(int Adapter, int Frontend)
 {
   static uint32_t SubsystemIds[] = {
-    0x13C23009, // Technotrend S2-6400 HDFF
+    0x13C23009, // Technotrend S2-6400 HDFF development samples
+    0x13C2300A, // Technotrend S2-6400 HDFF production version
     0x00000000
     };
   cString FileName;
