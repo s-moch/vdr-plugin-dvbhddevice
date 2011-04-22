@@ -364,7 +364,7 @@ bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
      if (playMode == pmNone)
         TurnOffLiveMode(true);
 
-     mHdffCmdIf->CmdAvSetPlayMode(1, Transferring());
+     mHdffCmdIf->CmdAvSetPlayMode(1, Transferring() || (cTransferControl::ReceiverDevice() == this));
      mHdffCmdIf->CmdAvSetStc(0, 100000);
      mHdffCmdIf->CmdAvEnableSync(0, true);
      mHdffCmdIf->CmdAvEnableVideoAfterStop(0, true);
