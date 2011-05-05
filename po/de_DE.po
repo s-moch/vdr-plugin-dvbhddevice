@@ -38,7 +38,7 @@ msgid "Disabled"
 msgstr "abgeschaltet"
 
 msgid "Analogue only"
-msgstr "Analoges Video"
+msgstr "nur Analoge Ausgänge"
 
 msgid "Always"
 msgstr "immer"
