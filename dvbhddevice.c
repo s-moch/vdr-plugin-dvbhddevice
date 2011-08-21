@@ -11,7 +11,7 @@
 #include "setup.h"
 
 static const char *VERSION        = "0.0.4";
-static const char *DESCRIPTION    = "HD Full Featured DVB device";
+static const char *DESCRIPTION    = trNOOP("HD Full Featured DVB device");
 
 class cPluginDvbhddevice : public cPlugin {
 private:
@@ -20,7 +20,7 @@ public:
   cPluginDvbhddevice(void);
   virtual ~cPluginDvbhddevice();
   virtual const char *Version(void) { return VERSION; }
-  virtual const char *Description(void) { return DESCRIPTION; }
+  virtual const char *Description(void) { return tr(DESCRIPTION); }
   virtual cMenuSetupPage *SetupMenu(void);
   virtual bool SetupParse(const char *Name, const char *Value);
   };

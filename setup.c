@@ -134,7 +134,7 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     static const char * VideoModeAdaptionItems[kVideoModeAdaptions] =
     {
         tr("Off"),
-        tr("Framerate"),
+        tr("Frame rate"),
         tr("HD Only"),
         tr("Always")
     };
