@@ -54,6 +54,7 @@ cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend)
      hdmiConfig.TransmitAudio = true;
      hdmiConfig.ForceDviMode = false;
      hdmiConfig.CecEnabled = gHdffSetup.CecEnabled;
+     hdmiConfig.VideoModeAdaption = (HDFF::eVideoModeAdaption) gHdffSetup.VideoModeAdaption;
      mHdffCmdIf->CmdHdmiConfigure(&hdmiConfig);
      if (gHdffSetup.CecEnabled)
         mHdffCmdIf->CmdHdmiSendCecCommand(HDFF::cecCommandTvOn);

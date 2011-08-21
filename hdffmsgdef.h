@@ -274,6 +274,14 @@ typedef enum _eHdmiVideoMode
     videoModeMaxValue
 } eHdmiVideoMode;
 
+typedef enum _eVideoModeAdaption
+{
+    videoModeAdaptOff,
+    videoModeAdaptFrameRate,
+    videoModeAdaptOnlyForHd,
+    videoModeAdaptAlways
+} eVideoModeAdaption;
+
 typedef enum _eCecCommand
 {
     cecCommandTvOn,
@@ -287,6 +295,7 @@ typedef struct _tHdmiConfig
     bool TransmitAudio;
     bool ForceDviMode;
     bool CecEnabled;
+    eVideoModeAdaption VideoModeAdaption;
 } tHdmiConfig;
 
 // Remote control definitions

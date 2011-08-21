@@ -1089,6 +1089,7 @@ void cHdffCmdIf::CmdHdmiConfigure(const tHdmiConfig * pConfig)
     {
         cmdBuf.SetBits(1, 0);
     }
+    cmdBuf.SetBits(3, (uint32_t) pConfig->VideoModeAdaption);
     osd_cmd.cmd_len = CmdSetLength(cmdBuf);
     ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
 }

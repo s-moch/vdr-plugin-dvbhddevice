@@ -20,6 +20,7 @@ struct cHdffSetup
     HDFF::eHdmiVideoMode GetVideoMode(void);
 
     int Resolution;
+    int VideoModeAdaption;
     int TvFormat;
     int VideoConversion;
     int AnalogueVideo;
