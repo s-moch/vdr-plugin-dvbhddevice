@@ -552,7 +552,7 @@ private:
     HDFF::cHdffCmdIf * mHdffCmdIf;
     int mDispWidth;
     int mDispHeight;
-    bool shown;
+    bool refresh;
     uint32_t mDisplay;
     uint32_t mBitmapPalette;
     uint32_t mBitmapColors[256];
@@ -575,24 +575,27 @@ cHdffOsdRaw::cHdffOsdRaw(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint 
 
     //printf("cHdffOsdRaw %d, %d, %d\n", Left, Top, Level);
     mHdffCmdIf = pHdffCmdIf;
-    shown = false;
+    refresh = true;
     mBitmapPalette = InvalidHandle;
+    mDisplay = InvalidHandle;
 
     gHdffSetup.GetOsdSize(mDispWidth, mDispHeight, pixelAspect);
-    mDisplay = mHdffCmdIf->CmdOsdCreateDisplay(mDispWidth, mDispHeight, HDFF::colorTypeARGB8888);
-    mHdffCmdIf->CmdOsdSetDisplayOutputRectangle(mDisplay, 0, 0, SizeFullScreen, SizeFullScreen);
 }
 
 cHdffOsdRaw::~cHdffOsdRaw()
 {
     //printf("~cHdffOsdRaw %d %d\n", Left(), Top());
-    SetActive(false);
-
+    if (mDisplay != InvalidHandle)
+    {
+        mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
+        mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
+    }
     if (mBitmapPalette != InvalidHandle)
         mHdffCmdIf->CmdOsdDeletePalette(mBitmapPalette);
-    mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
-    mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
-    mHdffCmdIf->CmdOsdDeleteDisplay(mDisplay);
+    mBitmapPalette = InvalidHandle;
+    if (mDisplay != InvalidHandle)
+       mHdffCmdIf->CmdOsdDeleteDisplay(mDisplay);
+    mDisplay = InvalidHandle;
 }
 
 void cHdffOsdRaw::SetActive(bool On)
@@ -602,14 +605,29 @@ void cHdffOsdRaw::SetActive(bool On)
         cOsd::SetActive(On);
         if (On)
         {
+            if (mDisplay == InvalidHandle)
+            {
+                mDisplay = mHdffCmdIf->CmdOsdCreateDisplay(mDispWidth, mDispHeight, HDFF::colorTypeARGB8888);
+                if (mDisplay != InvalidHandle)
+                    mHdffCmdIf->CmdOsdSetDisplayOutputRectangle(mDisplay, 0, 0, SizeFullScreen, SizeFullScreen);
+            }
+            refresh = true;
             if (GetBitmap(0)) // only flush here if there are already bitmaps
                 Flush();
         }
-        else if (shown)
+        else
         {
-            mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
-            mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
-            shown = false;
+            if (mDisplay != InvalidHandle)
+            {
+                mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
+                mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
+            }
+            if (mBitmapPalette != InvalidHandle)
+                mHdffCmdIf->CmdOsdDeletePalette(mBitmapPalette);
+            mBitmapPalette = InvalidHandle;
+            if (mDisplay != InvalidHandle)
+                mHdffCmdIf->CmdOsdDeleteDisplay(mDisplay);
+            mDisplay = InvalidHandle;
         }
     }
 }
@@ -635,18 +653,18 @@ eOsdError cHdffOsdRaw::SetAreas(const tArea *Areas, int NumAreas)
     {
         //printf("SetAreas %d: %d %d %d %d %d\n", i, Areas[i].x1, Areas[i].y1, Areas[i].x2, Areas[i].y2, Areas[i].bpp);
     }
-    if (shown)
+    if (mDisplay != InvalidHandle)
     {
         mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
         mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
-        shown = false;
+        refresh = true;
     }
     return cOsd::SetAreas(Areas, NumAreas);
 }
 
 void cHdffOsdRaw::Flush(void)
 {
-    if (!Active())
+    if (!Active() || (mDisplay == InvalidHandle))
         return;
     //struct timeval start;
     //struct timeval end;
@@ -688,9 +706,9 @@ void cHdffOsdRaw::Flush(void)
         for (int i = 0; (bitmap = GetBitmap(i)) != NULL; i++)
         {
             int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-            if (!shown || bitmap->Dirty(x1, y1, x2, y2))
+            if (refresh || bitmap->Dirty(x1, y1, x2, y2))
             {
-                if (!shown)
+                if (refresh)
                 {
                     x2 = bitmap->Width() - 1;
                     y2 = bitmap->Height() - 1;
@@ -745,7 +763,7 @@ void cHdffOsdRaw::Flush(void)
         //timeNeeded += (end.tv_sec - start.tv_sec) * 1000000;
         //printf("time = %d\n", timeNeeded);
     }
-    shown = true;
+    refresh = false;
 }
 
 
