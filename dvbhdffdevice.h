@@ -79,6 +79,7 @@ protected:
 private:
   int playVideoPid;
   int playAudioPid;
+  bool freezed;
 
   // Pes2Ts conversion stuff
   uint8_t videoCounter;

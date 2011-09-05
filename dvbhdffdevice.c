@@ -374,6 +374,7 @@ bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
      playAudioPid = -1;
      audioCounter = 0;
      videoCounter = 0;
+     freezed = false;
 
      mHdffCmdIf->CmdAvSetDecoderInput(0, 2);
      ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_MEMORY);
@@ -405,6 +406,7 @@ int64_t cDvbHdFfDevice::GetSTC(void)
 
 void cDvbHdFfDevice::TrickSpeed(int Speed)
 {
+  freezed = false;
   mHdffCmdIf->CmdAvEnableSync(0, false);
   mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF::audioStreamMpeg1);
   playAudioPid = -1;
@@ -424,6 +426,7 @@ void cDvbHdFfDevice::Clear(void)
 
 void cDvbHdFfDevice::Play(void)
 {
+  freezed = false;
   mHdffCmdIf->CmdAvEnableSync(0, true);
   mHdffCmdIf->CmdAvSetVideoSpeed(0, 100);
   mHdffCmdIf->CmdAvSetAudioSpeed(0, 100);
@@ -432,6 +435,7 @@ void cDvbHdFfDevice::Play(void)
 
 void cDvbHdFfDevice::Freeze(void)
 {
+  freezed = true;
   mHdffCmdIf->CmdAvSetVideoSpeed(0, 0);
   mHdffCmdIf->CmdAvSetAudioSpeed(0, 0);
   cDevice::Freeze();
@@ -594,6 +598,8 @@ uint32_t cDvbHdFfDevice::PesToTs(uint8_t * TsBuffer, uint16_t Pid, uint8_t & Cou
 
 int cDvbHdFfDevice::PlayVideo(const uchar *Data, int Length)
 {
+    if (freezed)
+        return -1;
     //TODO: support greater Length
     uint8_t tsBuffer[188 * 16];
     uint32_t tsLength;
@@ -612,6 +618,8 @@ int cDvbHdFfDevice::PlayVideo(const uchar *Data, int Length)
 
 int cDvbHdFfDevice::PlayAudio(const uchar *Data, int Length, uchar Id)
 {
+    if (freezed)
+        return -1;
     uint8_t streamId;
     uint8_t tsBuffer[188 * 16];
     uint32_t tsLength;
@@ -661,6 +669,8 @@ int cDvbHdFfDevice::PlayAudio(const uchar *Data, int Length, uchar Id)
 
 int cDvbHdFfDevice::PlayTsVideo(const uchar *Data, int Length)
 {
+  if (freezed)
+    return -1;
   int pid = TsPid(Data);
   if (pid != playVideoPid) {
      PatPmtParser();
@@ -687,6 +697,8 @@ static HDFF::eAudioStreamType MapAudioStreamTypes(int Atype)
 
 int cDvbHdFfDevice::PlayTsAudio(const uchar *Data, int Length)
 {
+  if (freezed)
+    return -1;
   int pid = TsPid(Data);
   if (pid != playAudioPid) {
      playAudioPid = pid;
