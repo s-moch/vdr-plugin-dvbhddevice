@@ -351,6 +351,9 @@ bool cDvbHdFfDevice::CanReplay(void) const
 bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
 {
   if (PlayMode == pmNone) {
+     mHdffCmdIf->CmdAvSetVideoSpeed(0, 100);
+     mHdffCmdIf->CmdAvSetAudioSpeed(0, 100);
+
      mHdffCmdIf->CmdAvEnableVideoAfterStop(0, false);
      mHdffCmdIf->CmdAvSetPcrPid(0, 0);
      mHdffCmdIf->CmdAvSetVideoPid(0, 0, HDFF::videoStreamMpeg2);
