@@ -80,6 +80,7 @@ private:
   int playVideoPid;
   int playAudioPid;
   bool freezed;
+  bool trickMode;
 
   // Pes2Ts conversion stuff
   uint8_t videoCounter;

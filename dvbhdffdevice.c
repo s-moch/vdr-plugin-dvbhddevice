@@ -378,6 +378,7 @@ bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
      audioCounter = 0;
      videoCounter = 0;
      freezed = false;
+     trickMode = false;
 
      mHdffCmdIf->CmdAvSetDecoderInput(0, 2);
      ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_MEMORY);
@@ -415,6 +416,7 @@ void cDvbHdFfDevice::TrickSpeed(int Speed)
   playAudioPid = -1;
   if (Speed > 0)
      mHdffCmdIf->CmdAvSetVideoSpeed(0, 100 / Speed);
+  trickMode = true;
 }
 
 void cDvbHdFfDevice::Clear(void)
@@ -430,6 +432,7 @@ void cDvbHdFfDevice::Clear(void)
 void cDvbHdFfDevice::Play(void)
 {
   freezed = false;
+  trickMode = false;
   mHdffCmdIf->CmdAvEnableSync(0, true);
   mHdffCmdIf->CmdAvSetVideoSpeed(0, 100);
   mHdffCmdIf->CmdAvSetAudioSpeed(0, 100);
@@ -623,6 +626,8 @@ int cDvbHdFfDevice::PlayAudio(const uchar *Data, int Length, uchar Id)
 {
     if (freezed)
         return -1;
+    if (trickMode)
+        return Length;
     uint8_t streamId;
     uint8_t tsBuffer[188 * 16];
     uint32_t tsLength;
@@ -702,6 +707,8 @@ int cDvbHdFfDevice::PlayTsAudio(const uchar *Data, int Length)
 {
   if (freezed)
     return -1;
+  if (trickMode)
+    return Length;
   int pid = TsPid(Data);
   if (pid != playAudioPid) {
      playAudioPid = pid;
