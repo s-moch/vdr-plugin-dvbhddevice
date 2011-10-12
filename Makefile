@@ -98,8 +98,9 @@ i18n: $(I18Nmsgs) $(I18Npot)
 
 ### Targets:
 
-libvdr-$(PLUGIN).so: $(OBJS)
-	$(CXX) $(CXXFLAGS) -shared $(OBJS) -o $@
+libvdr-$(PLUGIN).so: $(OBJS) libhdffcmd
+	$(MAKE) -C libhdffcmd all
+	$(CXX) $(CXXFLAGS) -shared $(OBJS) libhdffcmd/libhdffcmd.a -o $@
 	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
 
 dist: $(I18Npo) clean
@@ -112,3 +113,4 @@ dist: $(I18Npo) clean
 
 clean:
 	@-rm -f $(OBJS) $(DEPFILE) *.so *.tgz core* *~ $(PODIR)/*.mo $(PODIR)/*.pot
+	$(MAKE) -C libhdffcmd clean
