@@ -600,7 +600,7 @@ int HdffCmdOsdDrawWideText(int OsdDevice, uint32_t Display, uint32_t Font,
 
 int HdffCmdOsdDrawBitmap(int OsdDevice, uint32_t Display, uint16_t X,
                          uint16_t Y, const uint8_t * Bitmap, uint16_t BmpWidth,
-                         uint16_t BmpHeight, uint16_t BmpSize,
+                         uint16_t BmpHeight, uint32_t BmpSize,
                          HdffColorType_t ColorType, uint32_t Palette)
 {
     uint8_t cmdData[32];
