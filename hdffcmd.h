@@ -20,9 +20,6 @@ class cHdffCmdIf
 private:
     int mOsdDev;
 
-    void CmdBuildHeader(cBitBuffer & MsgBuf, eMessageType MsgType, eMessageGroup MsgGroup, eMessageId MsgId);
-    uint32_t CmdSetLength(cBitBuffer & MsgBuf);
-
 public:
     cHdffCmdIf(int OsdDev);
     ~cHdffCmdIf(void);

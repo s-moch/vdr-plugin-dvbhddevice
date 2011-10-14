@@ -8,29 +8,9 @@
 
 #include "hdffcmd.h"
 #include "libhdffcmd/hdffcmd.h"
-#include <linux/dvb/osd.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/ioctl.h>
 #include <vdr/tools.h>
-
-#if !defined OSD_RAW_CMD
-typedef struct osd_raw_cmd_s {
-    const void *cmd_data;
-    int cmd_len;
-    void *result_data;
-    int result_len;
-} osd_raw_cmd_t;
-
-typedef struct osd_raw_data_s {
-    const void *data_buffer;
-    int data_length;
-    int data_handle;
-} osd_raw_data_t;
-
-#define OSD_RAW_CMD            _IOWR('o', 162, osd_raw_cmd_t)
-#define OSD_RAW_DATA           _IOWR('o', 163, osd_raw_data_t)
-#endif
 
 
 namespace HDFF
@@ -49,464 +29,153 @@ cHdffCmdIf::~cHdffCmdIf(void)
 {
 }
 
-void cHdffCmdIf::CmdBuildHeader(cBitBuffer & MsgBuf, eMessageType MsgType, eMessageGroup MsgGroup, eMessageId MsgId)
-{
-    MsgBuf.SetBits(16, 0); // length field will be set later
-    MsgBuf.SetBits(6, 0); // reserved
-    MsgBuf.SetBits(2, MsgType);
-    MsgBuf.SetBits(8, MsgGroup);
-    MsgBuf.SetBits(16, MsgId);
-}
-
-uint32_t cHdffCmdIf::CmdSetLength(cBitBuffer & MsgBuf)
-{
-    uint32_t length;
-
-    length = MsgBuf.GetByteLength() - 2;
-    MsgBuf.SetDataByte(0, (uint8_t) (length >> 8));
-    MsgBuf.SetDataByte(1, (uint8_t) length);
-
-    return length + 2;
-}
-
 
 uint32_t cHdffCmdIf::CmdGetFirmwareVersion(char * pString, uint32_t MaxLength)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    cBitBuffer resBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
+    uint32_t version;
+    int err;
 
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    osd_cmd.result_data = resBuf.GetData();
-    osd_cmd.result_len = resBuf.GetMaxLength();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupGeneric, msgGenGetFirmwareVersion);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
-    if (osd_cmd.result_len > 0)
-    {
-        uint8_t * result = resBuf.GetData();
-        uint8_t textLength = result[9];
-        if (textLength >= MaxLength)
-            textLength = MaxLength - 1;
-        memcpy(pString, &result[10], textLength);
-        pString[textLength] = 0;
-        return (result[6] << 16) | (result[7] << 8) | result[8];
-    }
+    err = HdffCmdGetFirmwareVersion(mOsdDev, &version, pString, MaxLength);
+    if (err == 0)
+        return version;
     return 0;
 }
 
 uint32_t cHdffCmdIf::CmdGetInterfaceVersion(char * pString, uint32_t MaxLength)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    cBitBuffer resBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
+    uint32_t version;
+    int err;
 
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    osd_cmd.result_data = resBuf.GetData();
-    osd_cmd.result_len = resBuf.GetMaxLength();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupGeneric, msgGenGetInterfaceVersion);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
-    if (osd_cmd.result_len > 0)
-    {
-        uint8_t * result = resBuf.GetData();
-        uint8_t textLength = result[9];
-        if (textLength >= MaxLength)
-            textLength = MaxLength - 1;
-        memcpy(pString, &result[10], textLength);
-        pString[textLength] = 0;
-        return (result[6] << 16) | (result[7] << 8) | result[8];
-    }
+    err = HdffCmdGetInterfaceVersion(mOsdDev, &version, pString, MaxLength);
+    if (err == 0)
+        return version;
     return 0;
 }
 
 uint32_t cHdffCmdIf::CmdGetCopyrights(uint8_t Index, char * pString, uint32_t MaxLength)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    cBitBuffer resBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
+    int err;
 
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    osd_cmd.result_data = resBuf.GetData();
-    osd_cmd.result_len = resBuf.GetMaxLength();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupGeneric, msgGenGetCopyrights);
-    cmdBuf.SetBits(8, Index);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
-    if (osd_cmd.result_len > 0)
-    {
-        uint8_t * result = resBuf.GetData();
-        uint8_t index = result[6];
-        uint8_t textLen = result[7];
-        if (index == Index && textLen > 0)
-        {
-            if (textLen >= MaxLength)
-            {
-                textLen = MaxLength - 1;
-            }
-            memcpy(pString, result + 8, textLen);
-            pString[textLen] = 0;
-            return textLen;
-        }
-    }
+    err = HdffCmdGetCopyrights(mOsdDev, Index, pString, MaxLength);
+    if (err == 0)
+        return strlen(pString);
     return 0;
 }
 
 
 void cHdffCmdIf::CmdAvSetPlayMode(uint8_t PlayMode, bool Realtime)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetPlayMode);
-    cmdBuf.SetBits(1, Realtime ? 1 : 0);
-    cmdBuf.SetBits(7, PlayMode);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetPlayMode(mOsdDev, PlayMode, Realtime);
 }
 
 void cHdffCmdIf::CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVideoStreamType StreamType, bool PlaybackMode)
 {
     //printf("SetVideoPid %d %d\n", VideoPid, StreamType);
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetVideoPid);
-    cmdBuf.SetBits(4, DecoderIndex);
-    cmdBuf.SetBits(4, StreamType);
-    cmdBuf.SetBits(1, PlaybackMode ? 1 : 0);
-    cmdBuf.SetBits(15, VideoPid);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetVideoPid(mOsdDev, DecoderIndex, VideoPid,
+                         (HdffVideoStreamType_t) StreamType);
 }
 
 void cHdffCmdIf::CmdAvSetAudioPid(uint8_t DecoderIndex, uint16_t AudioPid, eAudioStreamType StreamType, eAVContainerType ContainerType)
 {
     //printf("SetAudioPid %d %d %d\n", AudioPid, StreamType, ContainerType);
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetAudioPid);
-    cmdBuf.SetBits(4, DecoderIndex);
-    cmdBuf.SetBits(4, StreamType);
-    cmdBuf.SetBits(2, 0); // reserved
-    cmdBuf.SetBits(1, ContainerType);
-    cmdBuf.SetBits(13, AudioPid);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetAudioPid(mOsdDev, DecoderIndex, AudioPid,
+                         (HdffAudioStreamType_t) StreamType,
+                         (HdffAvContainerType_t) ContainerType);
 }
 
 void cHdffCmdIf::CmdAvSetPcrPid(uint8_t DecoderIndex, uint16_t PcrPid)
 {
     //printf("SetPcrPid %d\n", PcrPid);
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetPcrPid);
-    cmdBuf.SetBits(4, DecoderIndex);
-    cmdBuf.SetBits(4, 0); // reserved
-    cmdBuf.SetBits(16, PcrPid);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetPcrPid(mOsdDev, DecoderIndex, PcrPid);
 }
 
 void cHdffCmdIf::CmdAvSetTeletextPid(uint8_t DecoderIndex, uint16_t TeletextPid)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetTeletextPid);
-    cmdBuf.SetBits(4, DecoderIndex);
-    cmdBuf.SetBits(4, 0); // reserved
-    cmdBuf.SetBits(16, TeletextPid);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetTeletextPid(mOsdDev, DecoderIndex, TeletextPid);
 }
 
 void cHdffCmdIf::CmdAvSetVideoWindow(uint8_t DecoderIndex, bool Enable, uint16_t X, uint16_t Y, uint16_t Width, uint16_t Height)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetVideoWindow);
-    cmdBuf.SetBits(4, DecoderIndex);
-    cmdBuf.SetBits(3, 0); // reserved
-    if (Enable)
-        cmdBuf.SetBits(1, 1);
-    else
-        cmdBuf.SetBits(1, 0);
-    cmdBuf.SetBits(16, X);
-    cmdBuf.SetBits(16, Y);
-    cmdBuf.SetBits(16, Width);
-    cmdBuf.SetBits(16, Height);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetVideoWindow(mOsdDev, DecoderIndex, Enable, X, Y, Width, Height);
 }
 
 void cHdffCmdIf::CmdAvShowStillImage(uint8_t DecoderIndex, const uint8_t * pStillImage, int Size, eVideoStreamType StreamType)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-    osd_raw_data_t osd_data;
-
-    memset(&osd_data, 0, sizeof(osd_raw_data_t));
-    osd_data.data_buffer = (void *) pStillImage;
-    osd_data.data_length = Size;
-    ioctl(mOsdDev, OSD_RAW_DATA, &osd_data);
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvShowStillImage);
-    cmdBuf.SetBits(4, DecoderIndex);
-    cmdBuf.SetBits(4, StreamType);
-    cmdBuf.SetBits(16, osd_data.data_handle);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvShowStillImage(mOsdDev, DecoderIndex, pStillImage, Size,
+                            (HdffVideoStreamType_t) StreamType);
 }
 
 void cHdffCmdIf::CmdAvSetDecoderInput(uint8_t DecoderIndex, uint8_t DemultiplexerIndex)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetDecoderInput);
-    cmdBuf.SetBits(4, DecoderIndex);
-    cmdBuf.SetBits(4, DemultiplexerIndex);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetDecoderInput(mOsdDev, DecoderIndex, DemultiplexerIndex);
 }
 
 void cHdffCmdIf::CmdAvSetDemultiplexerInput(uint8_t DemultiplexerIndex, uint8_t TsInputIndex)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetDemultiplexerInput);
-    cmdBuf.SetBits(4, DemultiplexerIndex);
-    cmdBuf.SetBits(4, TsInputIndex);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetDemultiplexerInput(mOsdDev, DemultiplexerIndex, TsInputIndex);
 }
 
 void cHdffCmdIf::CmdAvSetVideoFormat(uint8_t DecoderIndex, const tVideoFormat * pVideoFormat)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
+    HdffVideoFormat_t videoFormat;
 
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetVideoFormat);
-    cmdBuf.SetBits(4, DecoderIndex);
-    if (pVideoFormat->AutomaticEnabled)
-    {
-        cmdBuf.SetBits(1, 1);
-    }
-    else
-    {
-        cmdBuf.SetBits(1, 0);
-    }
-    if (pVideoFormat->AfdEnabled)
-    {
-        cmdBuf.SetBits(1, 1);
-    }
-    else
-    {
-        cmdBuf.SetBits(1, 0);
-    }
-    cmdBuf.SetBits(2, pVideoFormat->TvFormat);
-    cmdBuf.SetBits(8, pVideoFormat->VideoConversion);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    videoFormat.AutomaticEnabled = pVideoFormat->AutomaticEnabled;
+    videoFormat.AfdEnabled = pVideoFormat->AfdEnabled;
+    videoFormat.TvFormat = (HdffTvFormat_t) pVideoFormat->TvFormat;
+    videoFormat.VideoConversion = (HdffVideoConversion_t) pVideoFormat->VideoConversion;
+
+    HdffCmdAvSetVideoFormat(mOsdDev, DecoderIndex, &videoFormat);
 }
 
 void cHdffCmdIf::CmdAvSetVideoOutputMode(uint8_t DecoderIndex, eVideoOutputMode OutputMode)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetVideoOutputMode);
-    cmdBuf.SetBits(8, OutputMode);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetVideoOutputMode(mOsdDev, DecoderIndex,
+                                (HdffVideoOutputMode_t) OutputMode);
 }
 
 void cHdffCmdIf::CmdAvSetStc(uint8_t DecoderIndex, uint64_t Stc)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetStc);
-    cmdBuf.SetBits(4, DecoderIndex);
-    cmdBuf.SetBits(3, 0); // reserved
-    cmdBuf.SetBits(1, (uint32_t) (Stc >> 32));
-    cmdBuf.SetBits(32, (uint32_t) Stc);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetStc(mOsdDev, DecoderIndex, Stc);
 }
 
 void cHdffCmdIf::CmdAvFlushBuffer(uint8_t DecoderIndex, bool FlushAudio, bool FlushVideo)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvFlushBuffer);
-    cmdBuf.SetBits(4, DecoderIndex);
-    if (FlushAudio)
-    {
-        cmdBuf.SetBits(1, 1);
-    }
-    else
-    {
-        cmdBuf.SetBits(1, 0);
-    }
-    if (FlushVideo)
-    {
-        cmdBuf.SetBits(1, 1);
-    }
-    else
-    {
-        cmdBuf.SetBits(1, 0);
-    }
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvFlushBuffer(mOsdDev, DecoderIndex, FlushAudio, FlushVideo);
 }
 
 void cHdffCmdIf::CmdAvEnableSync(uint8_t DecoderIndex, bool EnableSync)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvEnableSync);
-    cmdBuf.SetBits(4, DecoderIndex);
-    if (EnableSync)
-    {
-        cmdBuf.SetBits(1, 1);
-        cmdBuf.SetBits(1, 1);
-    }
-    else
-    {
-        cmdBuf.SetBits(1, 0);
-        cmdBuf.SetBits(1, 0);
-    }
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvEnableSync(mOsdDev, DecoderIndex, EnableSync, EnableSync);
 }
 
 void cHdffCmdIf::CmdAvSetVideoSpeed(uint8_t DecoderIndex, int32_t Speed)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetVideoSpeed);
-    cmdBuf.SetBits(4, DecoderIndex);
-    cmdBuf.SetBits(4, 0);
-    cmdBuf.SetBits(32, Speed);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetVideoSpeed(mOsdDev, DecoderIndex, Speed);
 }
 
 void cHdffCmdIf::CmdAvSetAudioSpeed(uint8_t DecoderIndex, int32_t Speed)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetAudioSpeed);
-    cmdBuf.SetBits(4, DecoderIndex);
-    cmdBuf.SetBits(4, 0);
-    cmdBuf.SetBits(32, Speed);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetAudioSpeed(mOsdDev, DecoderIndex, Speed);
 }
 
 void cHdffCmdIf::CmdAvEnableVideoAfterStop(uint8_t DecoderIndex, bool EnableVideoAfterStop)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvEnableVideoAfterStop);
-    cmdBuf.SetBits(4, DecoderIndex);
-    if (EnableVideoAfterStop)
-    {
-        cmdBuf.SetBits(1, 1);
-    }
-    else
-    {
-        cmdBuf.SetBits(1, 0);
-    }
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvEnableVideoAfterStop(mOsdDev, DecoderIndex, EnableVideoAfterStop);
 }
 
 void cHdffCmdIf::CmdAvSetAudioDelay(int16_t Delay)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetAudioDelay);
-    cmdBuf.SetBits(16, Delay);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetAudioDelay(mOsdDev, Delay);
 }
 
 void cHdffCmdIf::CmdAvSetAudioDownmix(eDownmixMode DownmixMode)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetAudioDownmix);
-    cmdBuf.SetBits(8, DownmixMode);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetAudioDownmix(mOsdDev, (HdffAudioDownmixMode_t) DownmixMode);
 }
 
 void cHdffCmdIf::CmdAvSetAudioChannel(uint8_t AudioChannel)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvDec, msgAvSetAudioChannel);
-    cmdBuf.SetBits(8, AudioChannel);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdAvSetAudioChannel(mOsdDev, AudioChannel);
 }
 
 
@@ -679,137 +348,52 @@ void cHdffCmdIf::CmdOsdRestoreRegion(uint32_t hDisplay)
 
 void cHdffCmdIf::CmdMuxSetVideoOut(eVideoOut VideoOut)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvMux, msgMuxSetVideoOut);
-    cmdBuf.SetBits(4, VideoOut);
-    cmdBuf.SetBits(4, 0); // reserved
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdMuxSetVideoOut(mOsdDev, (HdffVideoOut_t) VideoOut);
 }
 
 void cHdffCmdIf::CmdMuxSetVolume(uint8_t Volume)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvMux, msgMuxSetVolume);
-    cmdBuf.SetBits(8, Volume);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdMuxSetVolume(mOsdDev, Volume);
 }
 
 void cHdffCmdIf::CmdMuxMuteAudio(bool Mute)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupAvMux, msgMuxSetAudioMute);
-    cmdBuf.SetBits(1, Mute);
-    cmdBuf.SetBits(7, 0); // reserved
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdMuxMuteAudio(mOsdDev, Mute);
 }
 
 void cHdffCmdIf::CmdHdmiSetVideoMode(eHdmiVideoMode VideoMode)
 {
     //printf("HdmiSetVideoMode %d\n", VideoMode);
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupHdmi, msgHdmiSetVideoMode);
-    cmdBuf.SetBits(8, VideoMode);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdHdmiSetVideoMode(mOsdDev, (HdffVideoMode_t) VideoMode);
 }
 
 void cHdffCmdIf::CmdHdmiConfigure(const tHdmiConfig * pConfig)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
+    HdffHdmiConfig_t hdmiConfig;
 
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupHdmi, msgHdmiConfigure);
-    if (pConfig->TransmitAudio)
-    {
-        cmdBuf.SetBits(1, 1);
-    }
-    else
-    {
-        cmdBuf.SetBits(1, 0);
-    }
-    if (pConfig->ForceDviMode)
-    {
-        cmdBuf.SetBits(1, 1);
-    }
-    else
-    {
-        cmdBuf.SetBits(1, 0);
-    }
-    if (pConfig->CecEnabled)
-    {
-        cmdBuf.SetBits(1, 1);
-    }
-    else
-    {
-        cmdBuf.SetBits(1, 0);
-    }
-    cmdBuf.SetBits(3, (uint32_t) pConfig->VideoModeAdaption);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    hdmiConfig.TransmitAudio = pConfig->TransmitAudio;
+    hdmiConfig.ForceDviMode = pConfig->ForceDviMode;
+    hdmiConfig.CecEnabled = pConfig->CecEnabled;
+    hdmiConfig.VideoModeAdaption = (HdffVideoModeAdaption_t) pConfig->VideoModeAdaption;
+
+    HdffCmdHdmiConfigure(mOsdDev, &hdmiConfig);
 }
 
 void cHdffCmdIf::CmdHdmiSendCecCommand(eCecCommand Command)
 {
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupHdmi, msgHdmiSendCecCommand);
-    cmdBuf.SetBits(8, Command);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdHdmiSendCecCommand(mOsdDev, (HdffCecCommand_t) Command);
 }
 
 void cHdffCmdIf::CmdRemoteSetProtocol(eRemoteProtocol Protocol)
 {
     //printf("%s %d\n", __func__, Protocol);
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupRemoteControl, msgRemoteSetProtocol);
-    cmdBuf.SetBits(8, Protocol);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdRemoteSetProtocol(mOsdDev, (HdffRemoteProtocol_t) Protocol);
 }
 
 void cHdffCmdIf::CmdRemoteSetAddressFilter(bool Enable, uint32_t Address)
 {
     //printf("%s %d %d\n", __func__, Enable, Address);
-    cBitBuffer cmdBuf(MAX_CMD_LEN);
-    osd_raw_cmd_t osd_cmd;
-
-    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
-    osd_cmd.cmd_data = cmdBuf.GetData();
-    CmdBuildHeader(cmdBuf, msgTypeCommand, msgGroupRemoteControl, msgRemoteSetAddressFilter);
-    cmdBuf.SetBits(1, Enable);
-    cmdBuf.SetBits(7, 0); // reserved
-    cmdBuf.SetBits(32, Address);
-    osd_cmd.cmd_len = CmdSetLength(cmdBuf);
-    ioctl(mOsdDev, OSD_RAW_CMD, &osd_cmd);
+    HdffCmdRemoteSetAddressFilter(mOsdDev, Enable, Address);
 }
 
 } // end of namespace

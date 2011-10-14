@@ -9,104 +9,8 @@
 #ifndef _HDFF_MSGDEF_H_
 #define _HDFF_MSGDEF_H_
 
-#define MAX_CMD_LEN 1536
-
 namespace HDFF
 {
-
-typedef enum _eMessageType
-{
-    msgTypeCommand,
-    msgTypeAnswer,
-    msgTypeResult,
-    msgTypeEvent
-} eMessageType;
-
-typedef enum _eMessageGroup
-{
-    msgGroupGeneric,
-    msgGroupAvDec,
-    msgGroupAvMux,
-    msgGroupFrontend,
-    msgGroupOsd,
-    msgGroupHdmi,
-    msgGroupRemoteControl
-} eMessageGroup;
-
-typedef enum _eMessageId
-{
-    msgGenGetFirmwareVersion = 0,
-    msgGenGetInterfaceVersion,
-    msgGenGetCopyrights,
-
-    msgAvSetAudioPid = 0,
-    msgAvSetVideoPid,
-    msgAvSetPcrPid,
-    msgAvSetTeletextPid,
-    msgAvShowStillImage,
-    msgAvSetVideoWindow,
-    msgAvSetDecoderInput,
-    msgAvSetDemultiplexerInput,
-    msgAvSetVideoFormat,
-    msgAvSetVideoOutputMode,
-    msgAvSetStc,
-    msgAvFlushBuffer,
-    msgAvEnableSync,
-    msgAvSetVideoSpeed,
-    msgAvSetAudioSpeed,
-    msgAvEnableVideoAfterStop,
-    msgAvGetVideoFormatInfo,
-    msgAvSetAudioDelay,
-    msgAvSetAudioDownmix,
-    msgAvSetAudioChannel,
-    msgAvSetPlayMode,
-
-    msgMuxSetVideoOut = 0,
-    msgMuxSetSlowBlank,
-    msgMuxSetFastBlank,
-    msgMuxSetVolume,
-    msgMuxSetAudioMute,
-
-    msgOsdConfigure = 0,
-    msgOsdReset,
-    msgOsdCreateDisplay = 10,
-    msgOsdDeleteDisplay,
-    msgOsdEnableDisplay,
-    msgOsdSetDisplayOutputRectangle,
-    msgOsdSetDisplayClippingArea,
-    msgOsdRenderDisplay,
-    msgOsdSaveRegion,
-    msgOsdRestoreRegion,
-    msgOsdCreatePalette = 30,
-    msgOsdDeletePalette,
-    msgOsdSetDisplayPalette,
-    msgOsdSetPaletteColors,
-    msgOsdCreateFontFace = 50,
-    msgOsdDeleteFontFace,
-    msgOsdCreateFont,
-    msgOsdDeleteFont,
-    msgOsdDrawPixel = 70,
-    msgOsdDrawRectangle,
-    msgOsdDrawCircle,
-    msgOsdDrawEllipse,
-    msgOsdDrawSlope,
-    msgOsdDrawText,
-    msgOsdDrawTextW,
-    msgOsdDrawBitmap,
-
-    msgHdmiEnableOutput = 0,
-    msgHdmiSetVideoMode,
-    msgHdmiConfigure,
-    msgHdmiIsDisplayConnected,
-    msgHdmiGetDisplayInfo,
-    msgHdmiGetVideoMode,
-    msgHdmiSendCecCommand,
-
-    msgRemoteSetProtocol = 0,
-    msgRemoteSetAddressFilter,
-    msgRemoteKeyEvent
-} eMessageId;
-
 
 // AvDec definitions
 
@@ -193,21 +97,6 @@ typedef enum _eVideoOut
     videoOutYc,
     videoOutMaxValue
 } eVideoOut;
-
-typedef enum _eSlowBlank
-{
-    slowBlankOff,
-    slowBlank16by9,
-    slowBlank4by3,
-    slowBlankMaxValue
-} eSlowBlank;
-
-typedef enum _eFastBlank
-{
-    fastBlankCvbs,
-    fastBlankRgb,
-    fastBlankMaxValue
-} eFastBlank;
 
 
 // OSD definitions
