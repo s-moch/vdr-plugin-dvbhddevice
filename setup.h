@@ -17,7 +17,7 @@ struct cHdffSetup
     cHdffSetup(void);
     bool SetupParse(const char * Name, const char * Value);
     void GetOsdSize(int &Width, int &Height, double &PixelAspect);
-    HDFF::eHdmiVideoMode GetVideoMode(void);
+    HdffVideoMode_t GetVideoMode(void);
 
     int Resolution;
     int VideoModeAdaption;

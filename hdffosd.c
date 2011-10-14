@@ -71,7 +71,7 @@ cHdffOsd::cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level)
 :   cOsd(Left, Top, Level)
 {
     double pixelAspect;
-    HDFF::tOsdConfig config;
+    HdffOsdConfig_t config;
 
     //printf("cHdffOsd %d, %d, %d\n", Left, Top, Level);
     mHdffCmdIf = pHdffCmdIf;
@@ -80,24 +80,24 @@ cHdffOsd::cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level)
     shown = false;
     mChanged = false;
     mBitmapModified = false;
-    mBitmapPalette = InvalidHandle;
+    mBitmapPalette = HDFF_INVALID_HANDLE;
     config.FontKerning = false;
     config.FontAntialiasing = Setup.AntiAlias ? true : false;
     mHdffCmdIf->CmdOsdConfigure(&config);
 
     gHdffSetup.GetOsdSize(mDispWidth, mDispHeight, pixelAspect);
-    mDisplay = mHdffCmdIf->CmdOsdCreateDisplay(mDispWidth, mDispHeight, HDFF::colorTypeARGB8888);
-    mHdffCmdIf->CmdOsdSetDisplayOutputRectangle(mDisplay, 0, 0, SizeFullScreen, SizeFullScreen);
+    mDisplay = mHdffCmdIf->CmdOsdCreateDisplay(mDispWidth, mDispHeight, HDFF_COLOR_TYPE_ARGB8888);
+    mHdffCmdIf->CmdOsdSetDisplayOutputRectangle(mDisplay, 0, 0, HDFF_SIZE_FULL_SCREEN, HDFF_SIZE_FULL_SCREEN);
     for (int i = 0; i < MAX_NUM_FONTFACES; i++)
     {
         mFontFaces[i].Name = "";
-        mFontFaces[i].Handle = InvalidHandle;
+        mFontFaces[i].Handle = HDFF_INVALID_HANDLE;
     }
     for (int i = 0; i < MAX_NUM_FONTS; i++)
     {
-        mFonts[i].hFontFace = InvalidHandle;
+        mFonts[i].hFontFace = HDFF_INVALID_HANDLE;
         mFonts[i].Size = 0;
-        mFonts[i].Handle = InvalidHandle;
+        mFonts[i].Handle = HDFF_INVALID_HANDLE;
     }
 }
 
@@ -108,18 +108,18 @@ cHdffOsd::~cHdffOsd()
 
     for (int i = 0; i < MAX_NUM_FONTS; i++)
     {
-        if (mFonts[i].Handle == InvalidHandle)
+        if (mFonts[i].Handle == HDFF_INVALID_HANDLE)
             break;
         mHdffCmdIf->CmdOsdDeleteFont(mFonts[i].Handle);
     }
     for (int i = 0; i < MAX_NUM_FONTFACES; i++)
     {
-        if (mFontFaces[i].Handle == InvalidHandle)
+        if (mFontFaces[i].Handle == HDFF_INVALID_HANDLE)
             break;
         mHdffCmdIf->CmdOsdDeleteFontFace(mFontFaces[i].Handle);
     }
 
-    if (mBitmapPalette != InvalidHandle)
+    if (mBitmapPalette != HDFF_INVALID_HANDLE)
         mHdffCmdIf->CmdOsdDeletePalette(mBitmapPalette);
     mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
     mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
@@ -220,19 +220,19 @@ void cHdffOsd::DrawBitmap(int x, int y, const cBitmap &Bitmap, tColor ColorFg, t
                 mBitmapColors[i] = ColorFg;
         }
     }
-    if (mBitmapPalette == InvalidHandle)
+    if (mBitmapPalette == HDFF_INVALID_HANDLE)
     {
-        mBitmapPalette = mHdffCmdIf->CmdOsdCreatePalette(HDFF::colorTypeClut8,
-                HDFF::colorFormatARGB, numColors, mBitmapColors);
+        mBitmapPalette = mHdffCmdIf->CmdOsdCreatePalette(HDFF_COLOR_TYPE_CLUT8,
+                HDFF_COLOR_FORMAT_ARGB, numColors, mBitmapColors);
     }
     else
     {
         mHdffCmdIf->CmdOsdSetPaletteColors(mBitmapPalette,
-                HDFF::colorFormatARGB, 0, numColors, mBitmapColors);
+                HDFF_COLOR_FORMAT_ARGB, 0, numColors, mBitmapColors);
     }
     mHdffCmdIf->CmdOsdDrawBitmap(mDisplay, mLeft + x, mTop + y,
         (uint8_t *) Bitmap.Data(0, 0), Bitmap.Width(), Bitmap.Height(),
-        Bitmap.Width() * Bitmap.Height(), HDFF::colorTypeClut8, mBitmapPalette);
+        Bitmap.Width() * Bitmap.Height(), HDFF_COLOR_TYPE_CLUT8, mBitmapPalette);
 #if 0
     uint32_t * tmpBitmap = new uint32_t[Bitmap.Width() * Bitmap.Height()];
     for (int ix = 0; ix < Bitmap.Width(); ix++)
@@ -284,7 +284,7 @@ void cHdffOsd::DrawText(int x, int y, const char *s, tColor ColorFg, tColor Colo
     pFontFace = NULL;
     for (i = 0; i < MAX_NUM_FONTFACES; i++)
     {
-        if (mFontFaces[i].Handle == InvalidHandle)
+        if (mFontFaces[i].Handle == HDFF_INVALID_HANDLE)
             break;
 
         if (strcmp(mFontFaces[i].Name, Font->FontName()) == 0)
@@ -312,7 +312,7 @@ void cHdffOsd::DrawText(int x, int y, const char *s, tColor ColorFg, tColor Colo
                         if (fread(buffer, fileSize, 1, fp) == 1)
                         {
                             mFontFaces[i].Handle = mHdffCmdIf->CmdOsdCreateFontFace(buffer, fileSize);
-                            if (mFontFaces[i].Handle != InvalidHandle)
+                            if (mFontFaces[i].Handle != HDFF_INVALID_HANDLE)
                             {
                                 mFontFaces[i].Name = Font->FontName();
                                 pFontFace = &mFontFaces[i];
@@ -331,7 +331,7 @@ void cHdffOsd::DrawText(int x, int y, const char *s, tColor ColorFg, tColor Colo
     pFont = NULL;
     for (i = 0; i < MAX_NUM_FONTS; i++)
     {
-        if (mFonts[i].Handle == InvalidHandle)
+        if (mFonts[i].Handle == HDFF_INVALID_HANDLE)
             break;
 
         if (mFonts[i].hFontFace == pFontFace->Handle
@@ -346,7 +346,7 @@ void cHdffOsd::DrawText(int x, int y, const char *s, tColor ColorFg, tColor Colo
         if (i < MAX_NUM_FONTS)
         {
             mFonts[i].Handle = mHdffCmdIf->CmdOsdCreateFont(pFontFace->Handle, size);
-            if (mFonts[i].Handle != InvalidHandle)
+            if (mFonts[i].Handle != HDFF_INVALID_HANDLE)
             {
                 mFonts[i].hFontFace = pFontFace->Handle;
                 mFonts[i].Size = size;
@@ -435,9 +435,9 @@ void cHdffOsd::DrawEllipse(int x1, int y1, int x2, int y2, tColor Color, int Qua
     {
         case 1:
             if (Quadrants > 0)
-                flags = HDFF::drawQuarterTopRight;
+                flags = HDFF_DRAW_QUARTER_TOP_RIGHT;
             else
-                flags = HDFF::drawQuarterTopRightInverted;
+                flags = HDFF_DRAW_QUARTER_TOP_RIGHT_INVERTED;
             cx = x1;
             cy = y2;
             rx = x2 - x1;
@@ -445,9 +445,9 @@ void cHdffOsd::DrawEllipse(int x1, int y1, int x2, int y2, tColor Color, int Qua
             break;
         case 2:
             if (Quadrants > 0)
-                flags = HDFF::drawQuarterTopLeft;
+                flags = HDFF_DRAW_QUARTER_TOP_LEFT;
             else
-                flags = HDFF::drawQuarterTopLeftInverted;
+                flags = HDFF_DRAW_QUARTER_TOP_LEFT_INVERTED;
             cx = x2;
             cy = y2;
             rx = x2 - x1;
@@ -455,9 +455,9 @@ void cHdffOsd::DrawEllipse(int x1, int y1, int x2, int y2, tColor Color, int Qua
             break;
         case 3:
             if (Quadrants > 0)
-                flags = HDFF::drawQuarterBottomLeft;
+                flags = HDFF_DRAW_QUARTER_BOTTOM_LEFT;
             else
-                flags = HDFF::drawQuarterBottomLeftInverted;
+                flags = HDFF_DRAW_QUARTER_BOTTOM_LEFT_INVERTED;
             cx = x2;
             cy = y1;
             rx = x2 - x1;
@@ -465,44 +465,44 @@ void cHdffOsd::DrawEllipse(int x1, int y1, int x2, int y2, tColor Color, int Qua
             break;
         case 4:
             if (Quadrants > 0)
-                flags = HDFF::drawQuarterBottomRight;
+                flags = HDFF_DRAW_QUARTER_BOTTOM_RIGHT;
             else
-                flags = HDFF::drawQuarterBottomRightInverted;
+                flags = HDFF_DRAW_QUARTER_BOTTOM_RIGHT_INVERTED;
             cx = x1;
             cy = y1;
             rx = x2 - x1;
             ry = y2 - y1;
             break;
         case 5:
-            flags = HDFF::drawHalfRight;
+            flags = HDFF_DRAW_HALF_RIGHT;
             cx = x1;
             cy = (y1 + y2) / 2;
             rx = x2 - x1;
             ry = (y2 - y1) / 2;
             break;
         case 6:
-            flags = HDFF::drawHalfTop;
+            flags = HDFF_DRAW_HALF_TOP;
             cx = (x1 + x2) / 2;
             cy = y2;
             rx = (x2 - x1) / 2;
             ry = y2 - y1;
             break;
         case 7:
-            flags = HDFF::drawHalfLeft;
+            flags = HDFF_DRAW_HALF_LEFT;
             cx = x2;
             cy = (y1 + y2) / 2;
             rx = x2 - x1;
             ry = (y2 - y1) / 2;
             break;
         case 8:
-            flags = HDFF::drawHalfBottom;
+            flags = HDFF_DRAW_HALF_BOTTOM;
             cx = (x1 + x2) / 2;
             cy = y1;
             rx = (x2 - x1) / 2;
             ry = y2 - y1;
             break;
         default:
-            flags = HDFF::drawFull;
+            flags = HDFF_DRAW_FULL;
             cx = (x1 + x2) / 2;
             cy = (y1 + y2) / 2;
             rx = (x2 - x1) / 2;
@@ -576,8 +576,8 @@ cHdffOsdRaw::cHdffOsdRaw(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint 
     //printf("cHdffOsdRaw %d, %d, %d\n", Left, Top, Level);
     mHdffCmdIf = pHdffCmdIf;
     refresh = true;
-    mBitmapPalette = InvalidHandle;
-    mDisplay = InvalidHandle;
+    mBitmapPalette = HDFF_INVALID_HANDLE;
+    mDisplay = HDFF_INVALID_HANDLE;
 
     gHdffSetup.GetOsdSize(mDispWidth, mDispHeight, pixelAspect);
 }
@@ -585,17 +585,17 @@ cHdffOsdRaw::cHdffOsdRaw(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint 
 cHdffOsdRaw::~cHdffOsdRaw()
 {
     //printf("~cHdffOsdRaw %d %d\n", Left(), Top());
-    if (mDisplay != InvalidHandle)
+    if (mDisplay != HDFF_INVALID_HANDLE)
     {
         mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
         mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
     }
-    if (mBitmapPalette != InvalidHandle)
+    if (mBitmapPalette != HDFF_INVALID_HANDLE)
         mHdffCmdIf->CmdOsdDeletePalette(mBitmapPalette);
-    mBitmapPalette = InvalidHandle;
-    if (mDisplay != InvalidHandle)
+    mBitmapPalette = HDFF_INVALID_HANDLE;
+    if (mDisplay != HDFF_INVALID_HANDLE)
        mHdffCmdIf->CmdOsdDeleteDisplay(mDisplay);
-    mDisplay = InvalidHandle;
+    mDisplay = HDFF_INVALID_HANDLE;
 }
 
 void cHdffOsdRaw::SetActive(bool On)
@@ -605,11 +605,11 @@ void cHdffOsdRaw::SetActive(bool On)
         cOsd::SetActive(On);
         if (On)
         {
-            if (mDisplay == InvalidHandle)
+            if (mDisplay == HDFF_INVALID_HANDLE)
             {
-                mDisplay = mHdffCmdIf->CmdOsdCreateDisplay(mDispWidth, mDispHeight, HDFF::colorTypeARGB8888);
-                if (mDisplay != InvalidHandle)
-                    mHdffCmdIf->CmdOsdSetDisplayOutputRectangle(mDisplay, 0, 0, SizeFullScreen, SizeFullScreen);
+                mDisplay = mHdffCmdIf->CmdOsdCreateDisplay(mDispWidth, mDispHeight, HDFF_COLOR_TYPE_ARGB8888);
+                if (mDisplay != HDFF_INVALID_HANDLE)
+                    mHdffCmdIf->CmdOsdSetDisplayOutputRectangle(mDisplay, 0, 0, HDFF_SIZE_FULL_SCREEN, HDFF_SIZE_FULL_SCREEN);
             }
             refresh = true;
             if (GetBitmap(0)) // only flush here if there are already bitmaps
@@ -617,17 +617,17 @@ void cHdffOsdRaw::SetActive(bool On)
         }
         else
         {
-            if (mDisplay != InvalidHandle)
+            if (mDisplay != HDFF_INVALID_HANDLE)
             {
                 mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
                 mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
             }
-            if (mBitmapPalette != InvalidHandle)
+            if (mBitmapPalette != HDFF_INVALID_HANDLE)
                 mHdffCmdIf->CmdOsdDeletePalette(mBitmapPalette);
-            mBitmapPalette = InvalidHandle;
-            if (mDisplay != InvalidHandle)
+            mBitmapPalette = HDFF_INVALID_HANDLE;
+            if (mDisplay != HDFF_INVALID_HANDLE)
                 mHdffCmdIf->CmdOsdDeleteDisplay(mDisplay);
-            mDisplay = InvalidHandle;
+            mDisplay = HDFF_INVALID_HANDLE;
         }
     }
 }
@@ -653,7 +653,7 @@ eOsdError cHdffOsdRaw::SetAreas(const tArea *Areas, int NumAreas)
     {
         //printf("SetAreas %d: %d %d %d %d %d\n", i, Areas[i].x1, Areas[i].y1, Areas[i].x2, Areas[i].y2, Areas[i].bpp);
     }
-    if (mDisplay != InvalidHandle)
+    if (mDisplay != HDFF_INVALID_HANDLE)
     {
         mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
         mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
@@ -664,7 +664,7 @@ eOsdError cHdffOsdRaw::SetAreas(const tArea *Areas, int NumAreas)
 
 void cHdffOsdRaw::Flush(void)
 {
-    if (!Active() || (mDisplay == InvalidHandle))
+    if (!Active() || (mDisplay == HDFF_INVALID_HANDLE))
         return;
     //struct timeval start;
     //struct timeval end;
@@ -691,7 +691,7 @@ void cHdffOsdRaw::Flush(void)
                  mHdffCmdIf->CmdOsdDrawBitmap(mDisplay,
                      Left() + pm->ViewPort().X(), Top() + pm->ViewPort().Y() + y,
                      pm->Data() + y * d, w, hc, hc * d,
-                     HDFF::colorTypeARGB8888, InvalidHandle);
+                     HDFF_COLOR_TYPE_ARGB8888, HDFF_INVALID_HANDLE);
             }
             delete pm;
             render = true;
@@ -720,15 +720,15 @@ void cHdffOsdRaw::Flush(void)
                 {
                     for (int c = 0; c < numColors; c++)
                         mBitmapColors[c] = colors[c];
-                    if (mBitmapPalette == InvalidHandle)
+                    if (mBitmapPalette == HDFF_INVALID_HANDLE)
                     {
-                        mBitmapPalette = mHdffCmdIf->CmdOsdCreatePalette(HDFF::colorTypeClut8,
-                            HDFF::colorFormatARGB, numColors, mBitmapColors);
+                        mBitmapPalette = mHdffCmdIf->CmdOsdCreatePalette(HDFF_COLOR_TYPE_CLUT8,
+                            HDFF_COLOR_FORMAT_ARGB, numColors, mBitmapColors);
                     }
                     else
                     {
                         mHdffCmdIf->CmdOsdSetPaletteColors(mBitmapPalette,
-                            HDFF::colorFormatARGB, 0, numColors, mBitmapColors);
+                            HDFF_COLOR_FORMAT_ARGB, 0, numColors, mBitmapColors);
                     }
                 }
                 // commit modified data:
@@ -747,7 +747,7 @@ void cHdffOsdRaw::Flush(void)
                     mHdffCmdIf->CmdOsdDrawBitmap(mDisplay,
                         Left() + bitmap->X0() + x1, Top() + bitmap->Y0() + y1 + y,
                         buffer, width, hc, hc * width,
-                        HDFF::colorTypeClut8, mBitmapPalette);
+                        HDFF_COLOR_TYPE_CLUT8, mBitmapPalette);
                 }
                 render = true;
             }

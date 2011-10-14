@@ -68,19 +68,17 @@ void cHdffCmdIf::CmdAvSetPlayMode(uint8_t PlayMode, bool Realtime)
     HdffCmdAvSetPlayMode(mOsdDev, PlayMode, Realtime);
 }
 
-void cHdffCmdIf::CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, eVideoStreamType StreamType, bool PlaybackMode)
+void cHdffCmdIf::CmdAvSetVideoPid(uint8_t DecoderIndex, uint16_t VideoPid, HdffVideoStreamType_t StreamType, bool PlaybackMode)
 {
     //printf("SetVideoPid %d %d\n", VideoPid, StreamType);
-    HdffCmdAvSetVideoPid(mOsdDev, DecoderIndex, VideoPid,
-                         (HdffVideoStreamType_t) StreamType);
+    HdffCmdAvSetVideoPid(mOsdDev, DecoderIndex, VideoPid, StreamType);
 }
 
-void cHdffCmdIf::CmdAvSetAudioPid(uint8_t DecoderIndex, uint16_t AudioPid, eAudioStreamType StreamType, eAVContainerType ContainerType)
+void cHdffCmdIf::CmdAvSetAudioPid(uint8_t DecoderIndex, uint16_t AudioPid, HdffAudioStreamType_t StreamType, HdffAvContainerType_t ContainerType)
 {
     //printf("SetAudioPid %d %d %d\n", AudioPid, StreamType, ContainerType);
-    HdffCmdAvSetAudioPid(mOsdDev, DecoderIndex, AudioPid,
-                         (HdffAudioStreamType_t) StreamType,
-                         (HdffAvContainerType_t) ContainerType);
+    HdffCmdAvSetAudioPid(mOsdDev, DecoderIndex, AudioPid, StreamType,
+                         ContainerType);
 }
 
 void cHdffCmdIf::CmdAvSetPcrPid(uint8_t DecoderIndex, uint16_t PcrPid)
@@ -99,10 +97,10 @@ void cHdffCmdIf::CmdAvSetVideoWindow(uint8_t DecoderIndex, bool Enable, uint16_t
     HdffCmdAvSetVideoWindow(mOsdDev, DecoderIndex, Enable, X, Y, Width, Height);
 }
 
-void cHdffCmdIf::CmdAvShowStillImage(uint8_t DecoderIndex, const uint8_t * pStillImage, int Size, eVideoStreamType StreamType)
+void cHdffCmdIf::CmdAvShowStillImage(uint8_t DecoderIndex, const uint8_t * pStillImage, int Size, HdffVideoStreamType_t StreamType)
 {
     HdffCmdAvShowStillImage(mOsdDev, DecoderIndex, pStillImage, Size,
-                            (HdffVideoStreamType_t) StreamType);
+                            StreamType);
 }
 
 void cHdffCmdIf::CmdAvSetDecoderInput(uint8_t DecoderIndex, uint8_t DemultiplexerIndex)
@@ -115,22 +113,14 @@ void cHdffCmdIf::CmdAvSetDemultiplexerInput(uint8_t DemultiplexerIndex, uint8_t 
     HdffCmdAvSetDemultiplexerInput(mOsdDev, DemultiplexerIndex, TsInputIndex);
 }
 
-void cHdffCmdIf::CmdAvSetVideoFormat(uint8_t DecoderIndex, const tVideoFormat * pVideoFormat)
+void cHdffCmdIf::CmdAvSetVideoFormat(uint8_t DecoderIndex, const HdffVideoFormat_t * pVideoFormat)
 {
-    HdffVideoFormat_t videoFormat;
-
-    videoFormat.AutomaticEnabled = pVideoFormat->AutomaticEnabled;
-    videoFormat.AfdEnabled = pVideoFormat->AfdEnabled;
-    videoFormat.TvFormat = (HdffTvFormat_t) pVideoFormat->TvFormat;
-    videoFormat.VideoConversion = (HdffVideoConversion_t) pVideoFormat->VideoConversion;
-
-    HdffCmdAvSetVideoFormat(mOsdDev, DecoderIndex, &videoFormat);
+    HdffCmdAvSetVideoFormat(mOsdDev, DecoderIndex, pVideoFormat);
 }
 
-void cHdffCmdIf::CmdAvSetVideoOutputMode(uint8_t DecoderIndex, eVideoOutputMode OutputMode)
+void cHdffCmdIf::CmdAvSetVideoOutputMode(uint8_t DecoderIndex, HdffVideoOutputMode_t OutputMode)
 {
-    HdffCmdAvSetVideoOutputMode(mOsdDev, DecoderIndex,
-                                (HdffVideoOutputMode_t) OutputMode);
+    HdffCmdAvSetVideoOutputMode(mOsdDev, DecoderIndex, OutputMode);
 }
 
 void cHdffCmdIf::CmdAvSetStc(uint8_t DecoderIndex, uint64_t Stc)
@@ -168,9 +158,9 @@ void cHdffCmdIf::CmdAvSetAudioDelay(int16_t Delay)
     HdffCmdAvSetAudioDelay(mOsdDev, Delay);
 }
 
-void cHdffCmdIf::CmdAvSetAudioDownmix(eDownmixMode DownmixMode)
+void cHdffCmdIf::CmdAvSetAudioDownmix(HdffAudioDownmixMode_t DownmixMode)
 {
-    HdffCmdAvSetAudioDownmix(mOsdDev, (HdffAudioDownmixMode_t) DownmixMode);
+    HdffCmdAvSetAudioDownmix(mOsdDev, DownmixMode);
 }
 
 void cHdffCmdIf::CmdAvSetAudioChannel(uint8_t AudioChannel)
@@ -179,15 +169,9 @@ void cHdffCmdIf::CmdAvSetAudioChannel(uint8_t AudioChannel)
 }
 
 
-void cHdffCmdIf::CmdOsdConfigure(const tOsdConfig * pConfig)
+void cHdffCmdIf::CmdOsdConfigure(const HdffOsdConfig_t * pConfig)
 {
-    HdffOsdConfig_t osdConfig;
-
-    memset(&osdConfig, 0, sizeof(osdConfig));
-    osdConfig.FontAntialiasing = pConfig->FontAntialiasing;
-    osdConfig.FontKerning = pConfig->FontKerning;
-
-    HdffCmdOsdConfigure(mOsdDev, &osdConfig);
+    HdffCmdOsdConfigure(mOsdDev, pConfig);
 }
 
 void cHdffCmdIf::CmdOsdReset(void)
@@ -195,14 +179,14 @@ void cHdffCmdIf::CmdOsdReset(void)
     HdffCmdOsdReset(mOsdDev);
 }
 
-uint32_t cHdffCmdIf::CmdOsdCreateDisplay(uint32_t Width, uint32_t Height, eColorType ColorType)
+uint32_t cHdffCmdIf::CmdOsdCreateDisplay(uint32_t Width, uint32_t Height, HdffColorType_t ColorType)
 {
     //printf("CreateDisplay %d %d %d\n", Width, Height, ColorType);
     uint32_t newDisplay;
 
-    if (HdffCmdOsdCreateDisplay(mOsdDev, Width, Height, (HdffColorType_t) ColorType, &newDisplay) == 0)
+    if (HdffCmdOsdCreateDisplay(mOsdDev, Width, Height, ColorType, &newDisplay) == 0)
         return newDisplay;
-    return InvalidHandle;
+    return HDFF_INVALID_HANDLE;
 }
 
 void cHdffCmdIf::CmdOsdDeleteDisplay(uint32_t hDisplay)
@@ -235,18 +219,17 @@ void cHdffCmdIf::CmdOsdRenderDisplay(uint32_t hDisplay)
     HdffCmdOsdRenderDisplay(mOsdDev, hDisplay);
 }
 
-uint32_t cHdffCmdIf::CmdOsdCreatePalette(eColorType ColorType, eColorFormat ColorFormat,
+uint32_t cHdffCmdIf::CmdOsdCreatePalette(HdffColorType_t ColorType, HdffColorFormat_t ColorFormat,
                                          uint32_t NumColors, const uint32_t * pColors)
 {
     uint32_t newPalette;
     int err;
 
-    err = HdffCmdOsdCreatePalette(mOsdDev, (HdffColorType_t) ColorType,
-                                  (HdffColorFormat_t) ColorFormat, NumColors,
+    err = HdffCmdOsdCreatePalette(mOsdDev, ColorType, ColorFormat, NumColors,
                                   pColors, &newPalette);
     if (err == 0)
         return newPalette;
-    return InvalidHandle;
+    return HDFF_INVALID_HANDLE;
 }
 
 void cHdffCmdIf::CmdOsdDeletePalette(uint32_t hPalette)
@@ -259,11 +242,11 @@ void cHdffCmdIf::CmdOsdSetDisplayPalette(uint32_t hDisplay, uint32_t hPalette)
     HdffCmdOsdSetDisplayPalette(mOsdDev, hDisplay, hPalette);
 }
 
-void cHdffCmdIf::CmdOsdSetPaletteColors(uint32_t hPalette, eColorFormat ColorFormat,
+void cHdffCmdIf::CmdOsdSetPaletteColors(uint32_t hPalette, HdffColorFormat_t ColorFormat,
                                         uint8_t StartColor, uint32_t NumColors, const uint32_t * pColors)
 {
-    HdffCmdOsdSetPaletteColors(mOsdDev, hPalette, (HdffColorFormat_t) ColorFormat,
-                               StartColor, NumColors, pColors);
+    HdffCmdOsdSetPaletteColors(mOsdDev, hPalette, ColorFormat, StartColor,
+                               NumColors, pColors);
 }
 
 uint32_t cHdffCmdIf::CmdOsdCreateFontFace(const uint8_t * pFontData, uint32_t DataSize)
@@ -275,7 +258,7 @@ uint32_t cHdffCmdIf::CmdOsdCreateFontFace(const uint8_t * pFontData, uint32_t Da
     err = HdffCmdOsdCreateFontFace(mOsdDev, pFontData, DataSize, &newFontFace);
     if (err == 0)
         return newFontFace;
-    return InvalidHandle;
+    return HDFF_INVALID_HANDLE;
 }
 
 void cHdffCmdIf::CmdOsdDeleteFontFace(uint32_t hFontFace)
@@ -293,7 +276,7 @@ uint32_t cHdffCmdIf::CmdOsdCreateFont(uint32_t hFontFace, uint32_t Size)
     err = HdffCmdOsdCreateFont(mOsdDev, hFontFace, Size, &newFont);
     if (err == 0)
         return newFont;
-    return InvalidHandle;
+    return HDFF_INVALID_HANDLE;
 }
 
 void cHdffCmdIf::CmdOsdDeleteFont(uint32_t hFont)
@@ -329,11 +312,11 @@ void cHdffCmdIf::CmdOsdDrawTextW(uint32_t hDisplay, uint32_t hFont, int X, int Y
 
 void cHdffCmdIf::CmdOsdDrawBitmap(uint32_t hDisplay, int X, int Y, const uint8_t * pBitmap,
                                   int BmpWidth, int BmpHeight, int BmpSize,
-                                  eColorType ColorType, uint32_t hPalette)
+                                  HdffColorType_t ColorType, uint32_t hPalette)
 {
     //printf("Bitmap (%d,%d) %d x %d\n", X, Y, BmpWidth, BmpHeight);
     HdffCmdOsdDrawBitmap(mOsdDev, hDisplay, X, Y, pBitmap, BmpWidth, BmpHeight,
-                         BmpSize, (HdffColorType_t) ColorType, hPalette);
+                         BmpSize, ColorType, hPalette);
 }
 
 void cHdffCmdIf::CmdOsdSaveRegion(uint32_t hDisplay, int X, int Y, int Width, int Height)
@@ -346,9 +329,9 @@ void cHdffCmdIf::CmdOsdRestoreRegion(uint32_t hDisplay)
     HdffCmdOsdRestoreRegion(mOsdDev, hDisplay);
 }
 
-void cHdffCmdIf::CmdMuxSetVideoOut(eVideoOut VideoOut)
+void cHdffCmdIf::CmdMuxSetVideoOut(HdffVideoOut_t VideoOut)
 {
-    HdffCmdMuxSetVideoOut(mOsdDev, (HdffVideoOut_t) VideoOut);
+    HdffCmdMuxSetVideoOut(mOsdDev, VideoOut);
 }
 
 void cHdffCmdIf::CmdMuxSetVolume(uint8_t Volume)
@@ -361,33 +344,26 @@ void cHdffCmdIf::CmdMuxMuteAudio(bool Mute)
     HdffCmdMuxMuteAudio(mOsdDev, Mute);
 }
 
-void cHdffCmdIf::CmdHdmiSetVideoMode(eHdmiVideoMode VideoMode)
+void cHdffCmdIf::CmdHdmiSetVideoMode(HdffVideoMode_t VideoMode)
 {
     //printf("HdmiSetVideoMode %d\n", VideoMode);
-    HdffCmdHdmiSetVideoMode(mOsdDev, (HdffVideoMode_t) VideoMode);
+    HdffCmdHdmiSetVideoMode(mOsdDev, VideoMode);
 }
 
-void cHdffCmdIf::CmdHdmiConfigure(const tHdmiConfig * pConfig)
+void cHdffCmdIf::CmdHdmiConfigure(const HdffHdmiConfig_t * pConfig)
 {
-    HdffHdmiConfig_t hdmiConfig;
-
-    hdmiConfig.TransmitAudio = pConfig->TransmitAudio;
-    hdmiConfig.ForceDviMode = pConfig->ForceDviMode;
-    hdmiConfig.CecEnabled = pConfig->CecEnabled;
-    hdmiConfig.VideoModeAdaption = (HdffVideoModeAdaption_t) pConfig->VideoModeAdaption;
-
-    HdffCmdHdmiConfigure(mOsdDev, &hdmiConfig);
+    HdffCmdHdmiConfigure(mOsdDev, pConfig);
 }
 
-void cHdffCmdIf::CmdHdmiSendCecCommand(eCecCommand Command)
+void cHdffCmdIf::CmdHdmiSendCecCommand(HdffCecCommand_t Command)
 {
-    HdffCmdHdmiSendCecCommand(mOsdDev, (HdffCecCommand_t) Command);
+    HdffCmdHdmiSendCecCommand(mOsdDev, Command);
 }
 
-void cHdffCmdIf::CmdRemoteSetProtocol(eRemoteProtocol Protocol)
+void cHdffCmdIf::CmdRemoteSetProtocol(HdffRemoteProtocol_t Protocol)
 {
     //printf("%s %d\n", __func__, Protocol);
-    HdffCmdRemoteSetProtocol(mOsdDev, (HdffRemoteProtocol_t) Protocol);
+    HdffCmdRemoteSetProtocol(mOsdDev, Protocol);
 }
 
 void cHdffCmdIf::CmdRemoteSetAddressFilter(bool Enable, uint32_t Address)
