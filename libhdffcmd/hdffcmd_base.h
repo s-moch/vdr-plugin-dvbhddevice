@@ -24,6 +24,26 @@
 #ifndef HDFFCMD_BASE_H
 #define HDFFCMD_BASE_H
 
+#include <linux/dvb/osd.h>
+
+#if !defined OSD_RAW_CMD
+typedef struct osd_raw_cmd_s {
+    const void *cmd_data;
+    int cmd_len;
+    void *result_data;
+    int result_len;
+} osd_raw_cmd_t;
+
+typedef struct osd_raw_data_s {
+    const void *data_buffer;
+    int data_length;
+    int data_handle;
+} osd_raw_data_t;
+
+#define OSD_RAW_CMD            _IOWR('o', 162, osd_raw_cmd_t)
+#define OSD_RAW_DATA           _IOWR('o', 163, osd_raw_data_t)
+#endif
+
 #include "bitbuffer.h"
 #include "hdffcmd_defs.h"
 

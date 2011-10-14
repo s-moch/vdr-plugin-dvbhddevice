@@ -6,7 +6,8 @@ VERSION = 0.1.0
 
 LIB_NAME = libhdffcmd
 
-LIB_OBJS = bitbuffer.o hdffcmd_base.o hdffcmd_osd.o
+LIB_OBJS = bitbuffer.o hdffcmd_av.o hdffcmd_base.o hdffcmd_generic.o \
+           hdffcmd_hdmi.o hdffcmd_mux.o hdffcmd_osd.o hdffcmd_remote.o
 
 LIB_STATIC = $(LIB_NAME).a
 LIB_SHARED = $(LIB_NAME)-$(VERSION).so

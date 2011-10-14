@@ -21,22 +21,36 @@
  *
  *********************************************************************/
 
-#ifndef HDFFCMD_H
-#define HDFFCMD_H
+#ifndef HDFFCMD_MUX_H
+#define HDFFCMD_MUX_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-#include "hdffcmd_av.h"
-#include "hdffcmd_generic.h"
-#include "hdffcmd_hdmi.h"
-#include "hdffcmd_mux.h"
-#include "hdffcmd_osd.h"
-#include "hdffcmd_remote.h"
+typedef enum HdffVideoOut_t
+{
+    HDFF_VIDEO_OUT_DISABLED,
+    HDFF_VIDEO_OUT_CVBS_RGB,
+    HDFF_VIDEO_OUT_CVBS_YUV,
+    HDFF_VIDEO_OUT_YC
+} HdffVideoOut_t;
 
-#ifdef __cplusplus
-}
-#endif
+typedef enum HdffSlowBlank_t
+{
+    HDFF_SLOW_BLANK_OFF,
+    HDFF_SLOW_BLANK_16_BY_9,
+    HDFF_SLOW_BLANK_4_BY_3
+} HdffSlowBlank_t;
 
-#endif /* HDFFCMD_H */
+typedef enum HdffFastBlank_t
+{
+    HDFF_FAST_BLANK_CVBS,
+    HDFF_FAST_BLANK_RGB
+} HdffFastBlank_t;
+
+
+int HdffCmdMuxSetVideoOut(int OsdDevice, HdffVideoOut_t VideoOut);
+
+int HdffCmdMuxSetVolume(int OsdDevice, uint8_t Volume);
+
+int HdffCmdMuxMuteAudio(int OsdDevice, int Mute);
+
+#endif /* HDFFCMD_MUX_H */

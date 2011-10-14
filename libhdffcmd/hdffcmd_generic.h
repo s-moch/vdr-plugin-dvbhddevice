@@ -21,22 +21,16 @@
  *
  *********************************************************************/
 
-#ifndef HDFFCMD_H
-#define HDFFCMD_H
+#ifndef HDFFCMD_GENERIC_H
+#define HDFFCMD_GENERIC_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+int HdffCmdGetFirmwareVersion(int OsdDevice, uint32_t * Version, char * String,
+                              uint32_t MaxLength);
 
-#include "hdffcmd_av.h"
-#include "hdffcmd_generic.h"
-#include "hdffcmd_hdmi.h"
-#include "hdffcmd_mux.h"
-#include "hdffcmd_osd.h"
-#include "hdffcmd_remote.h"
+int HdffCmdGetInterfaceVersion(int OsdDevice, uint32_t * Version, char * String,
+                               uint32_t MaxLength);
 
-#ifdef __cplusplus
-}
-#endif
+int HdffCmdGetCopyrights(int OsdDevice, uint8_t Index, char * String,
+                         uint32_t MaxLength);
 
-#endif /* HDFFCMD_H */
+#endif /* HDFFCMD_GENERIC_H */

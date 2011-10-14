@@ -21,22 +21,19 @@
  *
  *********************************************************************/
 
-#ifndef HDFFCMD_H
-#define HDFFCMD_H
+#ifndef HDFFCMD_REMOTE_H
+#define HDFFCMD_REMOTE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+typedef enum HdffRemoteProtocol_t
+{
+    HDFF_REMOTE_PROTOCOL_NONE,
+    HDFF_REMOTE_PROTOCOL_RC5,
+    HDFF_REMOTE_PROTOCOL_RC6
+} HdffRemoteProtocol_t;
 
-#include "hdffcmd_av.h"
-#include "hdffcmd_generic.h"
-#include "hdffcmd_hdmi.h"
-#include "hdffcmd_mux.h"
-#include "hdffcmd_osd.h"
-#include "hdffcmd_remote.h"
 
-#ifdef __cplusplus
-}
-#endif
+int HdffCmdRemoteSetProtocol(int OsdDevice, HdffRemoteProtocol_t Protocol);
 
-#endif /* HDFFCMD_H */
+int HdffCmdRemoteSetAddressFilter(int OsdDevice, int Enable, uint32_t Address);
+
+#endif /* HDFFCMD_REMOTE_H */
