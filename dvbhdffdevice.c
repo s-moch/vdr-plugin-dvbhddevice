@@ -209,11 +209,11 @@ bool cDvbHdFfDevice::SetPid(cPidHandle *Handle, int Type, bool On)
         if (Type == ptPcr)
            mHdffCmdIf->CmdAvSetPcrPid(0, 0);
         else if (Type == ptVideo)
-           mHdffCmdIf->CmdAvSetVideoPid(0, 0, HDFF_VIDEO_STREAM_INVALID);
+           mHdffCmdIf->CmdAvSetVideoPid(0, 0, HDFF_VIDEO_STREAM_MPEG1);
         else if (Type == ptAudio)
-           mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_INVALID);
+           mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_MPEG1);
         else if (Type == ptDolby)
-           mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_INVALID);
+           mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_AC3);
         //TODO missing setting to 0x1FFF??? see cDvbDevice::SetPid()
         close(Handle->handle);
         Handle->handle = -1;
@@ -356,8 +356,8 @@ bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
 
      mHdffCmdIf->CmdAvEnableVideoAfterStop(0, false);
      mHdffCmdIf->CmdAvSetPcrPid(0, 0);
-     mHdffCmdIf->CmdAvSetVideoPid(0, 0, HDFF_VIDEO_STREAM_INVALID);
-     mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_INVALID);
+     mHdffCmdIf->CmdAvSetVideoPid(0, 0, HDFF_VIDEO_STREAM_MPEG1);
+     mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_MPEG1);
 
      ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_DEMUX);
      mHdffCmdIf->CmdAvSetDecoderInput(0, 0);
@@ -412,7 +412,7 @@ void cDvbHdFfDevice::TrickSpeed(int Speed)
 {
   freezed = false;
   mHdffCmdIf->CmdAvEnableSync(0, false);
-  mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_INVALID);
+  mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_MPEG1);
   playAudioPid = -1;
   if (Speed > 0)
      mHdffCmdIf->CmdAvSetVideoSpeed(0, 100 / Speed);
@@ -422,8 +422,8 @@ void cDvbHdFfDevice::TrickSpeed(int Speed)
 void cDvbHdFfDevice::Clear(void)
 {
   CHECK(ioctl(fd_video, VIDEO_CLEAR_BUFFER));
-  mHdffCmdIf->CmdAvSetVideoPid(0, 0, HDFF_VIDEO_STREAM_INVALID);
-  mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_INVALID);
+  mHdffCmdIf->CmdAvSetVideoPid(0, 0, HDFF_VIDEO_STREAM_MPEG1);
+  mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_MPEG1);
   playVideoPid = -1;
   playAudioPid = -1;
   cDevice::Clear();
@@ -699,7 +699,7 @@ static HdffAudioStreamType_t MapAudioStreamTypes(int Atype)
     case SI::EnhancedAC3DescriptorTag: return HDFF_AUDIO_STREAM_EAC3;
     case 0x0F: return HDFF_AUDIO_STREAM_AAC;
     case 0x11: return HDFF_AUDIO_STREAM_HE_AAC;
-    default: return HDFF_AUDIO_STREAM_INVALID;
+    default: return HDFF_AUDIO_STREAM_MPEG1;
     }
 }
 
