@@ -4,10 +4,25 @@
 
 VERSION = 0.1.0
 
+ifndef $(INSTALL_PATH)
+    INSTALL_PATH=/usr/local
+endif
+
+ifndef $(INSTALL_LIB_PATH)
+    INSTALL_LIB_PATH=$(INSTALL_PATH)/lib
+endif
+
+ifndef $(INSTALL_INCLUDE_PATH)
+    INSTALL_INCLUDE_PATH=$(INSTALL_PATH)/include
+endif
+
 LIB_NAME = libhdffcmd
 
 LIB_OBJS = bitbuffer.o hdffcmd_av.o hdffcmd_base.o hdffcmd_generic.o \
            hdffcmd_hdmi.o hdffcmd_mux.o hdffcmd_osd.o hdffcmd_remote.o
+
+LIB_HEADERS = hdffcmd.h hdffcmd_av.h hdffcmd_generic.h hdffcmd_hdmi.h \
+              hdffcmd_mux.h hdffcmd_osd.h hdffcmd_remote.h
 
 LIB_STATIC = $(LIB_NAME).a
 LIB_SHARED = $(LIB_NAME)-$(VERSION).so
@@ -43,3 +58,18 @@ $(LIB_SHARED): $(LIB_OBJS)
 
 clean:
 	rm -f $(LIB_OBJS) $(DEPFILE) $(LIB_STATIC) $(LIB_NAME)*.so
+
+install: $(LIB_SHARED)
+	chown root $(LIB_SHARED)
+	chgrp root $(LIB_SHARED)
+	chmod 0755 $(LIB_SHARED)
+	cp -f $(LIB_SHARED) $(INSTALL_LIB_PATH)/
+	ln -sf $(LIB_SHARED) $(INSTALL_LIB_PATH)/$(LIB_NAME).so
+	mkdir -p  $(INSTALL_INCLUDE_PATH)/libhdffcmd
+	list='$(LIB_HEADERS)'; \
+	for headerfile in $$list; do \
+	  cp -f $$headerfile $(INSTALL_INCLUDE_PATH)/libhdffcmd/ ; \
+	  chown root $(INSTALL_INCLUDE_PATH)/libhdffcmd/$$headerfile ; \
+	  chgrp root $(INSTALL_INCLUDE_PATH)/libhdffcmd/$$headerfile ; \
+	  chmod 0644 $(INSTALL_INCLUDE_PATH)/libhdffcmd/$$headerfile ; \
+	done
