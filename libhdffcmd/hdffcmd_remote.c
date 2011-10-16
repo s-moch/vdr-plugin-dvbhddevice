@@ -58,7 +58,7 @@ int HdffCmdRemoteSetAddressFilter(int OsdDevice, int Enable, uint32_t Address)
     osd_cmd.cmd_data = cmdData;
     HdffCmdBuildHeader(&cmdBuf, HDFF_MSG_TYPE_COMMAND,
                        HDFF_MSG_GROUP_REMOTE_CONTROL,
-                       HDFF_MSG_REMOTE_SET_PROTOCOL);
+                       HDFF_MSG_REMOTE_SET_ADDRESS_FILTER);
     BitBuffer_SetBits(&cmdBuf, 1, Enable);
     BitBuffer_SetBits(&cmdBuf, 7, 0); // reserved
     BitBuffer_SetBits(&cmdBuf, 32, Address);
