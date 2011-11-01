@@ -350,41 +350,58 @@ bool cDvbHdFfDevice::CanReplay(void) const
 
 bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
 {
-  if (PlayMode == pmNone) {
-     mHdffCmdIf->CmdAvSetVideoSpeed(0, 100);
-     mHdffCmdIf->CmdAvSetAudioSpeed(0, 100);
+    if (PlayMode == pmNone)
+    {
+        if (fd_video == -1)
+            fd_video = DvbOpen(DEV_DVB_VIDEO,  adapter, frontend, O_RDWR | O_NONBLOCK);
+        if (fd_audio == -1)
+            fd_audio = DvbOpen(DEV_DVB_AUDIO,  adapter, frontend, O_RDWR | O_NONBLOCK);
 
-     mHdffCmdIf->CmdAvEnableVideoAfterStop(0, false);
-     mHdffCmdIf->CmdAvSetPcrPid(0, 0);
-     mHdffCmdIf->CmdAvSetVideoPid(0, 0, HDFF_VIDEO_STREAM_MPEG1);
-     mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_MPEG1);
+        mHdffCmdIf->CmdAvSetVideoSpeed(0, 100);
+        mHdffCmdIf->CmdAvSetAudioSpeed(0, 100);
 
-     ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_DEMUX);
-     mHdffCmdIf->CmdAvSetDecoderInput(0, 0);
-     mHdffCmdIf->CmdAvEnableSync(0, true);
-     mHdffCmdIf->CmdAvSetPlayMode(0, true);
-     }
-  else {
-     if (playMode == pmNone)
-        TurnOffLiveMode(true);
+        mHdffCmdIf->CmdAvEnableVideoAfterStop(0, false);
+        mHdffCmdIf->CmdAvSetPcrPid(0, 0);
+        mHdffCmdIf->CmdAvSetVideoPid(0, 0, HDFF_VIDEO_STREAM_MPEG1);
+        mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_MPEG1);
 
-     mHdffCmdIf->CmdAvSetPlayMode(1, Transferring() || (cTransferControl::ReceiverDevice() == this));
-     mHdffCmdIf->CmdAvSetStc(0, 100000);
-     mHdffCmdIf->CmdAvEnableSync(0, true);
-     mHdffCmdIf->CmdAvEnableVideoAfterStop(0, true);
+        ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_DEMUX);
+        mHdffCmdIf->CmdAvSetDecoderInput(0, 0);
+        mHdffCmdIf->CmdAvEnableSync(0, true);
+        mHdffCmdIf->CmdAvSetPlayMode(0, true);
+    }
+    else
+    {
+        if (playMode == pmNone)
+            TurnOffLiveMode(true);
 
-     playVideoPid = -1;
-     playAudioPid = -1;
-     audioCounter = 0;
-     videoCounter = 0;
-     freezed = false;
-     trickMode = false;
+        if (PlayMode == pmExtern_THIS_SHOULD_BE_AVOIDED)
+        {
+            close(fd_video);
+            fd_video = -1;
+            close(fd_audio);
+            fd_audio = -1;
+        }
+        else
+        {
+            mHdffCmdIf->CmdAvSetPlayMode(1, Transferring() || (cTransferControl::ReceiverDevice() == this));
+            mHdffCmdIf->CmdAvSetStc(0, 100000);
+            mHdffCmdIf->CmdAvEnableSync(0, true);
+            mHdffCmdIf->CmdAvEnableVideoAfterStop(0, true);
 
-     mHdffCmdIf->CmdAvSetDecoderInput(0, 2);
-     ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_MEMORY);
-     }
-  playMode = PlayMode;
-  return true;
+            playVideoPid = -1;
+            playAudioPid = -1;
+            audioCounter = 0;
+            videoCounter = 0;
+            freezed = false;
+            trickMode = false;
+
+            mHdffCmdIf->CmdAvSetDecoderInput(0, 2);
+            ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_MEMORY);
+        }
+    }
+    playMode = PlayMode;
+    return true;
 }
 
 int64_t cDvbHdFfDevice::GetSTC(void)
