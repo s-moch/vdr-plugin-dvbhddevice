@@ -9,7 +9,6 @@
 #ifndef _HDFF_CMD_H_
 #define _HDFF_CMD_H_
 
-#include "bitbuffer.h"
 #include "libhdffcmd/hdffcmd.h"
 
 namespace HDFF

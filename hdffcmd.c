@@ -6,6 +6,8 @@
  * $Id: hdffcmd.c 1.1 2009/12/29 14:30:08 kls Exp $
  */
 
+#include <stdint.h>
+
 #include "hdffcmd.h"
 #include "libhdffcmd/hdffcmd.h"
 #include <stdio.h>

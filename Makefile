@@ -51,7 +51,7 @@ DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 
 ### The object files (add further files here):
 
-OBJS = $(PLUGIN).o bitbuffer.o dvbhdffdevice.o hdffcmd.o hdffosd.o setup.o
+OBJS = $(PLUGIN).o dvbhdffdevice.o hdffcmd.o hdffosd.o setup.o
 
 ### The main target:
 

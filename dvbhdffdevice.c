@@ -6,6 +6,8 @@
  * $Id: dvbhdffdevice.c 1.4 2010/01/04 12:53:47 kls Exp $
  */
 
+#include <stdint.h>
+
 #include "dvbhdffdevice.h"
 #include <errno.h>
 #include <limits.h>
