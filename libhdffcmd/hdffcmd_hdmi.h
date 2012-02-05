@@ -65,4 +65,8 @@ int HdffCmdHdmiConfigure(int OsdDevice, const HdffHdmiConfig_t * Config);
 
 int HdffCmdHdmiSendCecCommand(int OsdDevice, HdffCecCommand_t Command);
 
+int HdffCmdHdmiSendRawCecCommand(int OsdDevice, uint8_t Destination,
+                                 uint8_t Opcode, const uint8_t * Operand,
+                                 uint8_t OperandLength);
+
 #endif /* HDFFCMD_HDMI_H */

@@ -90,3 +90,31 @@ int HdffCmdHdmiSendCecCommand(int OsdDevice, HdffCecCommand_t Command)
     osd_cmd.cmd_len = HdffCmdSetLength(&cmdBuf);
     return ioctl(OsdDevice, OSD_RAW_CMD, &osd_cmd);
 }
+
+int HdffCmdHdmiSendRawCecCommand(int OsdDevice, uint8_t Destination,
+                                 uint8_t Opcode, const uint8_t * Operand,
+                                 uint8_t OperandLength)
+{
+    uint8_t cmdData[24];
+    BitBuffer_t cmdBuf;
+    osd_raw_cmd_t osd_cmd;
+    int i;
+
+    if (OperandLength > 14)
+        OperandLength = 14;
+
+    BitBuffer_Init(&cmdBuf, cmdData, sizeof(cmdData));
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdData;
+    HdffCmdBuildHeader(&cmdBuf, HDFF_MSG_TYPE_COMMAND, HDFF_MSG_GROUP_HDMI,
+                       HDFF_MSG_HDMI_SEND_RAW_CEC_COMMAND);
+    BitBuffer_SetBits(&cmdBuf, 4, 0); // reserved
+    BitBuffer_SetBits(&cmdBuf, 4, Destination);
+    BitBuffer_SetBits(&cmdBuf, 8, Opcode);
+    BitBuffer_SetBits(&cmdBuf, 8, OperandLength);
+    for (i = 0; i < OperandLength; i++)
+        BitBuffer_SetBits(&cmdBuf, 8, Operand[i]);
+
+    osd_cmd.cmd_len = HdffCmdSetLength(&cmdBuf);
+    return ioctl(OsdDevice, OSD_RAW_CMD, &osd_cmd);
+}
