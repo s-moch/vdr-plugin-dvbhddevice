@@ -42,6 +42,10 @@ class cHdffSetupPage : public cMenuSetupPage
 private:
     HDFF::cHdffCmdIf * mHdffCmdIf;
     cHdffSetup mNewHdffSetup;
+    cOsdItem * mTvFormatItem;
+    int mVideoConversion;
+
+    void BuildVideoConversionItem(void);
 
 protected:
     virtual void Store(void);
@@ -49,6 +53,7 @@ protected:
 public:
     cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf);
     virtual ~cHdffSetupPage(void);
+    virtual eOSState ProcessKey(eKeys Key);
 };
 
 #endif

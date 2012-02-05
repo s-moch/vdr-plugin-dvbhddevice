@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2012-02-05 17:34+0100\n"
+"POT-Creation-Date: 2012-02-05 20:02+0100\n"
 "PO-Revision-Date: 2011-07-10 00:23+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team:  <see README>\n"
@@ -34,32 +34,14 @@ msgstr ""
 msgid "Always"
 msgstr "Sempre"
 
-msgid "Automatic"
-msgstr "Automatica"
-
-msgid "Letterbox 16/9"
-msgstr "Letterbox 16:9"
-
-msgid "Letterbox 14/9"
-msgstr "Letterbox 14:9"
-
-msgid "Pillarbox"
-msgstr "Pillarbox"
-
-msgid "CentreCutOut"
-msgstr "CentreCutOut"
-
-msgid "Always 16/9"
-msgstr "Sempre 16:9"
-
-msgid "Zoom 16/9"
-msgstr ""
-
 msgid "Disabled"
 msgstr "Disabilitata"
 
 msgid "Analogue only"
 msgstr "Solo analogica"
+
+msgid "Automatic"
+msgstr "Automatica"
 
 msgid "HDMI only"
 msgstr "Solo HDMI"
@@ -78,9 +60,6 @@ msgstr ""
 
 msgid "TV format"
 msgstr "Formato TV"
-
-msgid "Video Conversion"
-msgstr "Conversione video"
 
 msgid "Analogue Video"
 msgstr "Video analogico"
@@ -108,3 +87,24 @@ msgstr "OSD alto livello"
 
 msgid "Allow True Color OSD"
 msgstr "Permetti OSD True Color"
+
+msgid "Letterbox 16/9"
+msgstr "Letterbox 16:9"
+
+msgid "Letterbox 14/9"
+msgstr "Letterbox 14:9"
+
+msgid "CentreCutOut"
+msgstr "CentreCutOut"
+
+msgid "Pillarbox"
+msgstr "Pillarbox"
+
+msgid "Always 16/9"
+msgstr "Sempre 16:9"
+
+msgid "Zoom 16/9"
+msgstr ""
+
+msgid "Video Conversion"
+msgstr "Conversione video"

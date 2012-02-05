@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR \n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2012-02-05 17:34+0100\n"
+"POT-Creation-Date: 2012-02-05 20:02+0100\n"
 "PO-Revision-Date: 2011-04-25 21:44+0200\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: Finnish <vdr@linuxtv.org>\n"
@@ -31,32 +31,14 @@ msgstr "vain HD-resoluutiolla"
 msgid "Always"
 msgstr "aina"
 
-msgid "Automatic"
-msgstr "automaattinen"
-
-msgid "Letterbox 16/9"
-msgstr "letterbox 16:9"
-
-msgid "Letterbox 14/9"
-msgstr "letterbox 14:9"
-
-msgid "Pillarbox"
-msgstr "pillarbox"
-
-msgid "CentreCutOut"
-msgstr "center cut out"
-
-msgid "Always 16/9"
-msgstr "aina 16:9"
-
-msgid "Zoom 16/9"
-msgstr ""
-
 msgid "Disabled"
 msgstr "ei käytössä"
 
 msgid "Analogue only"
 msgstr "vain analoginen"
+
+msgid "Automatic"
+msgstr "automaattinen"
 
 msgid "HDMI only"
 msgstr "vain HDMI"
@@ -75,9 +57,6 @@ msgstr "Sovita näyttömoodi"
 
 msgid "TV format"
 msgstr "Näytön kuvasuhde"
-
-msgid "Video Conversion"
-msgstr "Näyttömuoto"
 
 msgid "Analogue Video"
 msgstr "Analoginen kuvalähtö"
@@ -105,3 +84,24 @@ msgstr "Käytä korkean tason kuvaruutunäyttöä"
 
 msgid "Allow True Color OSD"
 msgstr "Salli tosivärit kuvaruutunäytölle"
+
+msgid "Letterbox 16/9"
+msgstr "letterbox 16:9"
+
+msgid "Letterbox 14/9"
+msgstr "letterbox 14:9"
+
+msgid "CentreCutOut"
+msgstr "center cut out"
+
+msgid "Pillarbox"
+msgstr "pillarbox"
+
+msgid "Always 16/9"
+msgstr "aina 16:9"
+
+msgid "Zoom 16/9"
+msgstr ""
+
+msgid "Video Conversion"
+msgstr "Näyttömuoto"

@@ -117,7 +117,6 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     const int kResolutions = 4;
     const int kVideoModeAdaptions = 4;
     const int kTvFormats = 2;
-    const int kVideoConversions = 7;
     const int kAnalogueVideos = 4;
     const int kAudioDownmixes = 5;
     const int kOsdSizes = 5;
@@ -144,18 +143,6 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
         "4/3",
         "16/9",
     };
-
-    static const char * VideoConversionItems[kVideoConversions] =
-    {
-        tr("Automatic"),
-        tr("Letterbox 16/9"),
-        tr("Letterbox 14/9"),
-        tr("Pillarbox"),
-        tr("CentreCutOut"),
-        tr("Always 16/9"),
-        tr("Zoom 16/9"),
-    };
-
 
     static const char * AnalogueVideoItems[kAnalogueVideos] =
     {
@@ -195,8 +182,8 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
 
     Add(new cMenuEditStraItem(tr("Resolution"), &mNewHdffSetup.Resolution, kResolutions, ResolutionItems));
     Add(new cMenuEditStraItem(tr("Video Mode Adaption"), &mNewHdffSetup.VideoModeAdaption, kVideoModeAdaptions, VideoModeAdaptionItems));
-    Add(new cMenuEditStraItem(tr("TV format"), &mNewHdffSetup.TvFormat, kTvFormats, TvFormatItems));
-    Add(new cMenuEditStraItem(tr("Video Conversion"), &mNewHdffSetup.VideoConversion, kVideoConversions, VideoConversionItems));
+    mTvFormatItem = new cMenuEditStraItem(tr("TV format"), &mNewHdffSetup.TvFormat, kTvFormats, TvFormatItems);
+    Add(mTvFormatItem);
     Add(new cMenuEditStraItem(tr("Analogue Video"), &mNewHdffSetup.AnalogueVideo, kAnalogueVideos, AnalogueVideoItems));
     Add(new cMenuEditIntItem(tr("Audio Delay (ms)"), &mNewHdffSetup.AudioDelay, 0, 500));
     Add(new cMenuEditStraItem(tr("Audio Downmix"), &mNewHdffSetup.AudioDownmix, kAudioDownmixes, AudioDownmixItems));
@@ -206,14 +193,119 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     Add(new cMenuEditIntItem(tr("Remote Control Address"), &mNewHdffSetup.RemoteAddress, -1, 31));
     Add(new cMenuEditBoolItem(tr("High Level OSD"), &mNewHdffSetup.HighLevelOsd));
     Add(new cMenuEditBoolItem(tr("Allow True Color OSD"), &mNewHdffSetup.TrueColorOsd));
+
+    mVideoConversion = 0;
+    if (mNewHdffSetup.TvFormat == HDFF_TV_FORMAT_16_BY_9)
+    {
+        switch (mNewHdffSetup.VideoConversion)
+        {
+            case HDFF_VIDEO_CONVERSION_PILLARBOX:
+                mVideoConversion = 0;
+                break;
+            case HDFF_VIDEO_CONVERSION_CENTRE_CUT_OUT:
+                mVideoConversion = 1;
+                break;
+            case HDFF_VIDEO_CONVERSION_ALWAYS_16_BY_9:
+                mVideoConversion = 2;
+                break;
+            case HDFF_VIDEO_CONVERSION_ZOOM_16_BY_9:
+                mVideoConversion = 3;
+                break;
+        }
+    }
+    else
+    {
+        switch (mNewHdffSetup.VideoConversion)
+        {
+            case HDFF_VIDEO_CONVERSION_LETTERBOX_16_BY_9:
+                mVideoConversion = 0;
+                break;
+            case HDFF_VIDEO_CONVERSION_LETTERBOX_14_BY_9:
+                mVideoConversion = 1;
+                break;
+            case HDFF_VIDEO_CONVERSION_CENTRE_CUT_OUT:
+                mVideoConversion = 2;
+                break;
+        }
+    }
+    BuildVideoConversionItem();
 }
 
 cHdffSetupPage::~cHdffSetupPage(void)
 {
 }
 
+void cHdffSetupPage::BuildVideoConversionItem(void)
+{
+    const int kVideoConversions4by3 = 3;
+    const int kVideoConversions16by9 = 4;
+
+    static const char * VideoConversionItems4by3[kVideoConversions4by3] =
+    {
+        tr("Letterbox 16/9"),
+        tr("Letterbox 14/9"),
+        tr("CentreCutOut")
+    };
+
+    static const char * VideoConversionItems16by9[kVideoConversions16by9] =
+    {
+        tr("Pillarbox"),
+        tr("CentreCutOut"),
+        tr("Always 16/9"),
+        tr("Zoom 16/9")
+    };
+
+    cOsdItem * item;
+
+    cList<cOsdItem>::Del(mTvFormatItem->Next());
+    if (mNewHdffSetup.TvFormat == HDFF_TV_FORMAT_16_BY_9)
+    {
+        item = new cMenuEditStraItem(tr("Video Conversion"), &mVideoConversion,
+                kVideoConversions16by9, VideoConversionItems16by9);
+    }
+    else
+    {
+        item = new cMenuEditStraItem(tr("Video Conversion"), &mVideoConversion,
+                kVideoConversions4by3, VideoConversionItems4by3);
+    }
+    Add(item, false, mTvFormatItem);
+}
+
 void cHdffSetupPage::Store(void)
 {
+    if (mNewHdffSetup.TvFormat == HDFF_TV_FORMAT_16_BY_9)
+    {
+        switch (mVideoConversion)
+        {
+            case 0:
+                mNewHdffSetup.VideoConversion = HDFF_VIDEO_CONVERSION_PILLARBOX;
+                break;
+            case 1:
+                mNewHdffSetup.VideoConversion = HDFF_VIDEO_CONVERSION_CENTRE_CUT_OUT;
+                break;
+            case 2:
+                mNewHdffSetup.VideoConversion = HDFF_VIDEO_CONVERSION_ALWAYS_16_BY_9;
+                break;
+            case 3:
+                mNewHdffSetup.VideoConversion = HDFF_VIDEO_CONVERSION_ZOOM_16_BY_9;
+                break;
+        }
+    }
+    else
+    {
+        switch (mVideoConversion)
+        {
+            case 0:
+                mNewHdffSetup.VideoConversion = HDFF_VIDEO_CONVERSION_LETTERBOX_16_BY_9;
+                break;
+            case 1:
+                mNewHdffSetup.VideoConversion = HDFF_VIDEO_CONVERSION_LETTERBOX_14_BY_9;
+                break;
+            case 2:
+                mNewHdffSetup.VideoConversion = HDFF_VIDEO_CONVERSION_CENTRE_CUT_OUT;
+                break;
+        }
+    }
     SetupStore("Resolution", mNewHdffSetup.Resolution);
     SetupStore("VideoModeAdaption", mNewHdffSetup.VideoModeAdaption);
     SetupStore("TvFormat", mNewHdffSetup.TvFormat);
@@ -259,4 +351,30 @@ void cHdffSetupPage::Store(void)
     }
 
     gHdffSetup = mNewHdffSetup;
+}
+
+eOSState cHdffSetupPage::ProcessKey(eKeys key)
+{
+	eOSState state = cMenuSetupPage::ProcessKey(key);
+
+	if (state == osContinue)
+	{
+		cOsdItem * item;
+		switch (key)
+		{
+			case kLeft:
+			case kRight:
+				item = Get(Current());
+				if (item == mTvFormatItem)
+				{
+				    mVideoConversion = 0;
+					BuildVideoConversionItem();
+					Display();
+				}
+				break;
+			default:
+				break;
+		}
+	}
+	return state;
 }
