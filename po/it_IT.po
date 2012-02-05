@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2011-08-21 14:02+0200\n"
+"POT-Creation-Date: 2012-02-05 17:34+0100\n"
 "PO-Revision-Date: 2011-07-10 00:23+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team:  <see README>\n"
@@ -51,6 +51,9 @@ msgstr "CentreCutOut"
 
 msgid "Always 16/9"
 msgstr "Sempre 16:9"
+
+msgid "Zoom 16/9"
+msgstr ""
 
 msgid "Disabled"
 msgstr "Disabilitata"

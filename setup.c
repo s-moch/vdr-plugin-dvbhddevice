@@ -117,7 +117,7 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     const int kResolutions = 4;
     const int kVideoModeAdaptions = 4;
     const int kTvFormats = 2;
-    const int kVideoConversions = 6;
+    const int kVideoConversions = 7;
     const int kAnalogueVideos = 4;
     const int kAudioDownmixes = 5;
     const int kOsdSizes = 5;
@@ -153,6 +153,7 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
         tr("Pillarbox"),
         tr("CentreCutOut"),
         tr("Always 16/9"),
+        tr("Zoom 16/9"),
     };
 
 
