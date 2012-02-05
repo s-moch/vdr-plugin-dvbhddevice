@@ -47,6 +47,7 @@ typedef struct HdffHdmiConfig_t
     int ForceDviMode;
     int CecEnabled;
     HdffVideoModeAdaption_t VideoModeAdaption;
+    char CecDeviceName[14];
 } HdffHdmiConfig_t;
 
 typedef enum HdffCecCommand_t

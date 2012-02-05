@@ -48,9 +48,11 @@ int HdffCmdHdmiSetVideoMode(int OsdDevice, HdffVideoMode_t VideoMode)
 
 int HdffCmdHdmiConfigure(int OsdDevice, const HdffHdmiConfig_t * Config)
 {
-    uint8_t cmdData[8];
+    uint8_t cmdData[24];
     BitBuffer_t cmdBuf;
     osd_raw_cmd_t osd_cmd;
+    size_t nameLen;
+    int i;
 
     BitBuffer_Init(&cmdBuf, cmdData, sizeof(cmdData));
     memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
@@ -61,6 +63,14 @@ int HdffCmdHdmiConfigure(int OsdDevice, const HdffHdmiConfig_t * Config)
     BitBuffer_SetBits(&cmdBuf, 1, Config->ForceDviMode ? 1 : 0);
     BitBuffer_SetBits(&cmdBuf, 1, Config->CecEnabled ? 1 : 0);
     BitBuffer_SetBits(&cmdBuf, 3, Config->VideoModeAdaption);
+    BitBuffer_SetBits(&cmdBuf, 6, 0); // reserved
+    nameLen = strlen(Config->CecDeviceName);
+    if (nameLen > 13)
+        nameLen = 13;
+    BitBuffer_SetBits(&cmdBuf, 4, nameLen);
+    for (i = 0; i < nameLen; i++)
+        BitBuffer_SetBits(&cmdBuf, 8, Config->CecDeviceName[i]);
+
     osd_cmd.cmd_len = HdffCmdSetLength(&cmdBuf);
     return ioctl(OsdDevice, OSD_RAW_CMD, &osd_cmd);
 }
