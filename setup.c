@@ -340,6 +340,7 @@ void cHdffSetupPage::Store(void)
 
         mHdffCmdIf->CmdMuxSetVideoOut((HdffVideoOut_t) mNewHdffSetup.AnalogueVideo);
 
+        memset(&hdmiConfig, 0, sizeof(hdmiConfig));
         hdmiConfig.TransmitAudio = true;
         hdmiConfig.ForceDviMode = false;
         hdmiConfig.CecEnabled = mNewHdffSetup.CecEnabled;
