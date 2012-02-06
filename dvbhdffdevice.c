@@ -61,9 +61,6 @@ cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend)
      hdmiConfig.VideoModeAdaption = (HdffVideoModeAdaption_t) gHdffSetup.VideoModeAdaption;
      mHdffCmdIf->CmdHdmiConfigure(&hdmiConfig);
 
-     if (gHdffSetup.CecEnabled)
-        mHdffCmdIf->CmdHdmiSendCecCommand(HDFF_CEC_COMMAND_TV_ON);
-
      mHdffCmdIf->CmdRemoteSetProtocol((HdffRemoteProtocol_t) gHdffSetup.RemoteProtocol);
      mHdffCmdIf->CmdRemoteSetAddressFilter(gHdffSetup.RemoteAddress >= 0, gHdffSetup.RemoteAddress);
      }
