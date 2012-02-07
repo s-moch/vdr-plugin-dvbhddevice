@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2012-02-07 19:53+0100\n"
+"POT-Creation-Date: 2012-02-07 20:13+0100\n"
 "PO-Revision-Date: 2011-07-10 00:23+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team:  <see README>\n"
@@ -99,6 +99,12 @@ msgstr "Dimensione OSD"
 
 msgid "HDMI CEC"
 msgstr "HDMI CEC"
+
+msgid "CEC: Switch TV on"
+msgstr ""
+
+msgid "CEC: Switch TV off"
+msgstr ""
 
 msgid "Remote Control Protocol"
 msgstr "Protocollo controllo remoto"

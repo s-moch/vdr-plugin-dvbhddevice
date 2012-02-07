@@ -49,14 +49,10 @@ void cPluginDvbhddevice::MainThreadHook(void)
     if (isUserInactive != mIsUserInactive)
     {
         mIsUserInactive = isUserInactive;
-        if (gHdffSetup.CecEnabled)
+        if (gHdffSetup.CecEnabled && gHdffSetup.CecTvOn)
         {
             HDFF::cHdffCmdIf * hdffCmdIf = cDvbHdFfDevice::GetHdffCmdHandler();
-            if (mIsUserInactive)
-            {
-                hdffCmdIf->CmdHdmiSendCecCommand(HDFF_CEC_COMMAND_TV_OFF);
-            }
-            else
+            if (!mIsUserInactive)
             {
                 hdffCmdIf->CmdHdmiSendCecCommand(HDFF_CEC_COMMAND_TV_ON);
             }

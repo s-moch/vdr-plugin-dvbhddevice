@@ -28,6 +28,8 @@ cHdffSetup::cHdffSetup(void)
     AudioDownmix = HDFF_AUDIO_DOWNMIX_AUTOMATIC;
     OsdSize = 0;
     CecEnabled = 1;
+    CecTvOn = 1;
+    CecTvOff = 0;
     RemoteProtocol = 1;
     RemoteAddress = -1;
     HighLevelOsd = 1;
@@ -46,6 +48,8 @@ bool cHdffSetup::SetupParse(const char *Name, const char *Value)
     else if (strcmp(Name, "AudioDownmix")      == 0) AudioDownmix      = atoi(Value);
     else if (strcmp(Name, "OsdSize")           == 0) OsdSize           = atoi(Value);
     else if (strcmp(Name, "CecEnabled")        == 0) CecEnabled        = atoi(Value);
+    else if (strcmp(Name, "CecTvOn")           == 0) CecTvOn           = atoi(Value);
+    else if (strcmp(Name, "CecTvOff")          == 0) CecTvOff          = atoi(Value);
     else if (strcmp(Name, "RemoteProtocol")    == 0) RemoteProtocol    = atoi(Value);
     else if (strcmp(Name, "RemoteAddress")     == 0) RemoteAddress     = atoi(Value);
     else if (strcmp(Name, "HighLevelOsd")      == 0) HighLevelOsd      = atoi(Value);
@@ -254,6 +258,8 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     Add(new cMenuEditStraItem(tr("Audio Downmix"), &mNewHdffSetup.AudioDownmix, kAudioDownmixes, AudioDownmixItems));
     Add(new cMenuEditStraItem(tr("OSD Size"), &mNewHdffSetup.OsdSize, kOsdSizes, OsdSizeItems));
     Add(new cMenuEditBoolItem(tr("HDMI CEC"), &mNewHdffSetup.CecEnabled));
+    Add(new cMenuEditBoolItem(tr("CEC: Switch TV on"), &mNewHdffSetup.CecTvOn));
+    Add(new cMenuEditBoolItem(tr("CEC: Switch TV off"), &mNewHdffSetup.CecTvOff));
     Add(new cMenuEditStraItem(tr("Remote Control Protocol"), &mNewHdffSetup.RemoteProtocol, kRemoteProtocols, RemoteProtocolItems));
     Add(new cMenuEditIntItem(tr("Remote Control Address"), &mNewHdffSetup.RemoteAddress, -1, 31));
     Add(new cMenuEditBoolItem(tr("High Level OSD"), &mNewHdffSetup.HighLevelOsd));
@@ -381,6 +387,8 @@ void cHdffSetupPage::Store(void)
     SetupStore("AudioDownmix", mNewHdffSetup.AudioDownmix);
     SetupStore("OsdSize", mNewHdffSetup.OsdSize);
     SetupStore("CecEnabled", mNewHdffSetup.CecEnabled);
+    SetupStore("CecTvOn", mNewHdffSetup.CecTvOn);
+    SetupStore("CecTvOff", mNewHdffSetup.CecTvOff);
     SetupStore("RemoteProtocol", mNewHdffSetup.RemoteProtocol);
     SetupStore("RemoteAddress", mNewHdffSetup.RemoteAddress);
     SetupStore("HighLevelOsd", mNewHdffSetup.HighLevelOsd);

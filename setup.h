@@ -30,6 +30,8 @@ struct cHdffSetup
     int AudioDownmix;
     int OsdSize;
     int CecEnabled;
+    int CecTvOn;
+    int CecTvOff;
     int RemoteProtocol;
     int RemoteAddress;
 

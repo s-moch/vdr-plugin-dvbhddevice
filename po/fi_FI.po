@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR \n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2012-02-07 19:53+0100\n"
+"POT-Creation-Date: 2012-02-07 20:13+0100\n"
 "PO-Revision-Date: 2011-04-25 21:44+0200\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: Finnish <vdr@linuxtv.org>\n"
@@ -96,6 +96,12 @@ msgstr "Kuvaruutunäytön koko"
 
 msgid "HDMI CEC"
 msgstr "Käytä HDMI CEC-toimintoa"
+
+msgid "CEC: Switch TV on"
+msgstr ""
+
+msgid "CEC: Switch TV off"
+msgstr ""
 
 msgid "Remote Control Protocol"
 msgstr "Kaukosäätimen protokolla"

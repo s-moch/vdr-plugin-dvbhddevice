@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR \n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2012-02-07 19:53+0100\n"
+"POT-Creation-Date: 2012-02-07 20:13+0100\n"
 "PO-Revision-Date: 2011-04-25 21:44+0200\n"
 "Last-Translator: Christoph Haubrich\n"
 "Language-Team: <see README>\n"
@@ -97,6 +97,12 @@ msgstr "OSD Größe"
 msgid "HDMI CEC"
 msgstr "HDMI CEC"
 
+msgid "CEC: Switch TV on"
+msgstr "CEC: TV einschalten"
+
+msgid "CEC: Switch TV off"
+msgstr "CEC: TV ausschalten"
+
 msgid "Remote Control Protocol"
 msgstr "Fernbedienungsprotokoll"
 
@@ -111,4 +117,3 @@ msgstr "Erlaube True Color OSD"
 
 msgid "Hide mainmenu entry"
 msgstr "Hauptmenüeintrag verstecken"
-

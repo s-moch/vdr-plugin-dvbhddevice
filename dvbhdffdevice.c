@@ -73,11 +73,17 @@ cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend)
 
 cDvbHdFfDevice::~cDvbHdFfDevice()
 {
-  delete spuDecoder;
-  if (isHdffPrimary)
-     delete mHdffCmdIf;
-  // We're not explicitly closing any device files here, since this sometimes
-  // caused segfaults. Besides, the program is about to terminate anyway...
+    delete spuDecoder;
+    if (isHdffPrimary)
+    {
+        if (gHdffSetup.CecEnabled && gHdffSetup.CecTvOff)
+        {
+            mHdffCmdIf->CmdHdmiSendCecCommand(HDFF_CEC_COMMAND_TV_OFF);
+        }
+        delete mHdffCmdIf;
+    }
+    // We're not explicitly closing any device files here, since this sometimes
+    // caused segfaults. Besides, the program is about to terminate anyway...
 }
 
 void cDvbHdFfDevice::MakePrimaryDevice(bool On)
