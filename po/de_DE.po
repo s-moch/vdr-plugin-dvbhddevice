@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR \n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2012-02-05 20:02+0100\n"
+"POT-Creation-Date: 2012-02-07 19:53+0100\n"
 "PO-Revision-Date: 2011-04-25 21:44+0200\n"
 "Last-Translator: Christoph Haubrich\n"
 "Language-Team: <see README>\n"
@@ -18,6 +18,33 @@ msgstr ""
 
 msgid "HD Full Featured DVB device"
 msgstr "HD Full Featured DVB device"
+
+msgid "Video Conversion"
+msgstr "Bildanpassung"
+
+msgid "TV on"
+msgstr "TV ein"
+
+msgid "Automatic"
+msgstr "automatisch"
+
+msgid "Letterbox 16/9"
+msgstr "Letterbox 16:9"
+
+msgid "Letterbox 14/9"
+msgstr "Letterbox 14:9"
+
+msgid "Pillarbox"
+msgstr "Pillarbox"
+
+msgid "CentreCutOut"
+msgstr "CentreCutOut"
+
+msgid "Always 16/9"
+msgstr "immer 16:9"
+
+msgid "Zoom 16/9"
+msgstr "Zoome 16:9"
 
 msgid "Off"
 msgstr "aus"
@@ -35,10 +62,7 @@ msgid "Disabled"
 msgstr "abgeschaltet"
 
 msgid "Analogue only"
-msgstr "nur Analoge Ausgänge"
-
-msgid "Automatic"
-msgstr "automatisch"
+msgstr "nur analoge Ausgänge"
 
 msgid "HDMI only"
 msgstr "nur HDMI"
@@ -85,23 +109,6 @@ msgstr "High Level OSD"
 msgid "Allow True Color OSD"
 msgstr "Erlaube True Color OSD"
 
-msgid "Letterbox 16/9"
-msgstr "Letterbox 16:9"
+msgid "Hide mainmenu entry"
+msgstr "Hauptmenüeintrag verstecken"
 
-msgid "Letterbox 14/9"
-msgstr "Letterbox 14:9"
-
-msgid "CentreCutOut"
-msgstr "CentreCutOut"
-
-msgid "Pillarbox"
-msgstr "Pillarbox"
-
-msgid "Always 16/9"
-msgstr "immer 16:9"
-
-msgid "Zoom 16/9"
-msgstr "Zoome 16:9"
-
-msgid "Video Conversion"
-msgstr "Videokonvertierung"

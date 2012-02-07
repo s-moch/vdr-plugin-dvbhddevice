@@ -9,10 +9,12 @@
 #include <vdr/plugin.h>
 #include <vdr/shutdown.h>
 #include "dvbhdffdevice.h"
+#include "menu.h"
 #include "setup.h"
 
 static const char *VERSION        = "0.0.4";
 static const char *DESCRIPTION    = trNOOP("HD Full Featured DVB device");
+static const char *MAINMENUENTRY  = "dvbhddevice";
 
 class cPluginDvbhddevice : public cPlugin {
 private:
@@ -24,6 +26,8 @@ public:
   virtual const char *Version(void) { return VERSION; }
   virtual const char *Description(void) { return tr(DESCRIPTION); }
   virtual void MainThreadHook(void);
+  virtual const char *MainMenuEntry(void);
+  virtual cOsdObject *MainMenuAction(void);
   virtual cMenuSetupPage *SetupMenu(void);
   virtual bool SetupParse(const char *Name, const char *Value);
   };
@@ -58,6 +62,16 @@ void cPluginDvbhddevice::MainThreadHook(void)
             }
         }
     }
+}
+
+const char *cPluginDvbhddevice::MainMenuEntry(void)
+{
+  return gHdffSetup.HideMainMenu ? NULL : MAINMENUENTRY;
+}
+
+cOsdObject *cPluginDvbhddevice::MainMenuAction(void)
+{
+  return new cHdffMenu(cDvbHdFfDevice::GetHdffCmdHandler());
 }
 
 cMenuSetupPage *cPluginDvbhddevice::SetupMenu(void)

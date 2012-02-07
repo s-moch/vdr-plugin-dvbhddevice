@@ -18,6 +18,8 @@ struct cHdffSetup
     bool SetupParse(const char * Name, const char * Value);
     void GetOsdSize(int &Width, int &Height, double &PixelAspect);
     HdffVideoMode_t GetVideoMode(void);
+    void SetNextVideoConversion(void);
+    const char * GetVideoConversionString(void);
 
     int Resolution;
     int VideoModeAdaption;
@@ -33,6 +35,8 @@ struct cHdffSetup
 
     int HighLevelOsd;
     int TrueColorOsd;
+
+    int HideMainMenu;
 };
 
 extern cHdffSetup gHdffSetup;

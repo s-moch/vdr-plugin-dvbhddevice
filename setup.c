@@ -32,6 +32,7 @@ cHdffSetup::cHdffSetup(void)
     RemoteAddress = -1;
     HighLevelOsd = 1;
     TrueColorOsd = 1;
+    HideMainMenu = 0;
 }
 
 bool cHdffSetup::SetupParse(const char *Name, const char *Value)
@@ -49,6 +50,7 @@ bool cHdffSetup::SetupParse(const char *Name, const char *Value)
     else if (strcmp(Name, "RemoteAddress")     == 0) RemoteAddress     = atoi(Value);
     else if (strcmp(Name, "HighLevelOsd")      == 0) HighLevelOsd      = atoi(Value);
     else if (strcmp(Name, "TrueColorOsd")      == 0) TrueColorOsd      = atoi(Value);
+    else if (strcmp(Name, "HideMainMenu")      == 0) HideMainMenu      = atoi(Value);
     else return false;
     return true;
 }
@@ -111,6 +113,69 @@ HdffVideoMode_t cHdffSetup::GetVideoMode(void)
             return HDFF_VIDEO_MODE_576I50;
     }
 }
+
+void cHdffSetup::SetNextVideoConversion(void)
+{
+    int nextVideoConversion = HDFF_VIDEO_CONVERSION_AUTOMATIC;
+
+    if (TvFormat == HDFF_TV_FORMAT_16_BY_9)
+    {
+        switch (VideoConversion)
+        {
+            case HDFF_VIDEO_CONVERSION_PILLARBOX:
+                nextVideoConversion = HDFF_VIDEO_CONVERSION_CENTRE_CUT_OUT;
+                break;
+            case HDFF_VIDEO_CONVERSION_CENTRE_CUT_OUT:
+                nextVideoConversion = HDFF_VIDEO_CONVERSION_ALWAYS_16_BY_9;
+                break;
+            case HDFF_VIDEO_CONVERSION_ALWAYS_16_BY_9:
+                nextVideoConversion = HDFF_VIDEO_CONVERSION_ZOOM_16_BY_9;
+                break;
+            case HDFF_VIDEO_CONVERSION_ZOOM_16_BY_9:
+                nextVideoConversion = HDFF_VIDEO_CONVERSION_PILLARBOX;
+                break;
+        }
+    }
+    else
+    {
+        switch (VideoConversion)
+        {
+            case HDFF_VIDEO_CONVERSION_LETTERBOX_16_BY_9:
+                nextVideoConversion = HDFF_VIDEO_CONVERSION_LETTERBOX_14_BY_9;
+                break;
+            case HDFF_VIDEO_CONVERSION_LETTERBOX_14_BY_9:
+                nextVideoConversion = HDFF_VIDEO_CONVERSION_CENTRE_CUT_OUT;
+                break;
+            case HDFF_VIDEO_CONVERSION_CENTRE_CUT_OUT:
+                nextVideoConversion = HDFF_VIDEO_CONVERSION_LETTERBOX_16_BY_9;
+                break;
+        }
+    }
+    VideoConversion = nextVideoConversion;
+}
+
+const char * cHdffSetup::GetVideoConversionString(void)
+{
+    switch (VideoConversion)
+    {
+        case HDFF_VIDEO_CONVERSION_AUTOMATIC:
+        default:
+            return tr("Automatic");
+        case HDFF_VIDEO_CONVERSION_LETTERBOX_16_BY_9:
+            return tr("Letterbox 16/9");
+        case HDFF_VIDEO_CONVERSION_LETTERBOX_14_BY_9:
+            return tr("Letterbox 14/9");
+        case HDFF_VIDEO_CONVERSION_PILLARBOX:
+            return tr("Pillarbox");
+        case HDFF_VIDEO_CONVERSION_CENTRE_CUT_OUT:
+            return tr("CentreCutOut");
+        case HDFF_VIDEO_CONVERSION_ALWAYS_16_BY_9:
+            return tr("Always 16/9");
+        case HDFF_VIDEO_CONVERSION_ZOOM_16_BY_9:
+            return tr("Zoom 16/9");
+    }
+}
+
 
 cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
 {
@@ -193,6 +258,7 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     Add(new cMenuEditIntItem(tr("Remote Control Address"), &mNewHdffSetup.RemoteAddress, -1, 31));
     Add(new cMenuEditBoolItem(tr("High Level OSD"), &mNewHdffSetup.HighLevelOsd));
     Add(new cMenuEditBoolItem(tr("Allow True Color OSD"), &mNewHdffSetup.TrueColorOsd));
+    Add(new cMenuEditBoolItem(tr("Hide mainmenu entry"), &mNewHdffSetup.HideMainMenu));
 
     mVideoConversion = 0;
     if (mNewHdffSetup.TvFormat == HDFF_TV_FORMAT_16_BY_9)
@@ -319,6 +385,7 @@ void cHdffSetupPage::Store(void)
     SetupStore("RemoteAddress", mNewHdffSetup.RemoteAddress);
     SetupStore("HighLevelOsd", mNewHdffSetup.HighLevelOsd);
     SetupStore("TrueColorOsd", mNewHdffSetup.TrueColorOsd);
+    SetupStore("HideMainMenu", mNewHdffSetup.HideMainMenu);
 
     if (mHdffCmdIf)
     {
@@ -330,7 +397,7 @@ void cHdffSetupPage::Store(void)
         HdffHdmiConfig_t hdmiConfig;
 
         videoFormat.AutomaticEnabled = true;
-        videoFormat.AfdEnabled = true;
+        videoFormat.AfdEnabled = false;
         videoFormat.TvFormat = (HdffTvFormat_t) mNewHdffSetup.TvFormat;
         videoFormat.VideoConversion = (HdffVideoConversion_t) mNewHdffSetup.VideoConversion;
         mHdffCmdIf->CmdAvSetVideoFormat(0, &videoFormat);
