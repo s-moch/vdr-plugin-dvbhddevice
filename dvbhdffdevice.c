@@ -65,10 +65,6 @@ cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend)
      mHdffCmdIf->CmdRemoteSetProtocol((HdffRemoteProtocol_t) gHdffSetup.RemoteProtocol);
      mHdffCmdIf->CmdRemoteSetAddressFilter(gHdffSetup.RemoteAddress >= 0, gHdffSetup.RemoteAddress);
      }
-
-  // Video format:
-
-  SetVideoFormat(Setup.VideoFormat);
 }
 
 cDvbHdFfDevice::~cDvbHdFfDevice()
