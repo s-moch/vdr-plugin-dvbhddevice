@@ -298,13 +298,6 @@ bool cDvbHdFfDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
   if (!cDvbDevice::SetChannelDevice(Channel, LiveView))
      return false;
 
-  // If this channel switch was requested by the EITScanner we don't wait for
-  // a lock and don't set any live PIDs (the EITScanner will wait for the lock
-  // by itself before setting any filters):
-
-  if (EITScanner.UsesDevice(this)) //XXX
-     return true;
-
   // PID settings:
 
   if (TurnOnLivePIDs) {
