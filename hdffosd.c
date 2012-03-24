@@ -230,35 +230,20 @@ void cHdffOsd::DrawBitmap(int x, int y, const cBitmap &Bitmap, tColor ColorFg, t
         mHdffCmdIf->CmdOsdSetPaletteColors(mBitmapPalette,
                 HDFF_COLOR_FORMAT_ARGB, 0, numColors, mBitmapColors);
     }
-    mHdffCmdIf->CmdOsdDrawBitmap(mDisplay, mLeft + x, mTop + y,
-        (uint8_t *) Bitmap.Data(0, 0), Bitmap.Width(), Bitmap.Height(),
-        Bitmap.Width() * Bitmap.Height(), HDFF_COLOR_TYPE_CLUT8, mBitmapPalette);
-#if 0
-    uint32_t * tmpBitmap = new uint32_t[Bitmap.Width() * Bitmap.Height()];
-    for (int ix = 0; ix < Bitmap.Width(); ix++)
+    int width = Bitmap.Width();
+    int height = Bitmap.Height();
+    int chunk = MAX_BITMAP_SIZE / width;
+    if (chunk > height)
+        chunk = height;
+    for (int yc = 0; yc < height; yc += chunk)
     {
-        for (int iy = 0; iy < Bitmap.Height(); iy++)
-        {
-            const tIndex * pixel = Bitmap.Data(ix, iy);
-            tColor color = Bitmap.Color(*pixel);
-            if (!Overlay || *pixel != 0)
-            {
-                if (ColorFg || ColorBg)
-                {
-                    if (*pixel == 0)
-                        color = ColorBg;
-                    else if (*pixel == 1)
-                        color = ColorFg;
-                }
-                tmpBitmap[Bitmap.Width() * iy + ix] = color;
-            }
-        }
+        int hc = chunk;
+        if (yc + hc > height)
+            hc = height - yc;
+        mHdffCmdIf->CmdOsdDrawBitmap(mDisplay, mLeft + x, mTop + y + yc,
+            (uint8_t *) Bitmap.Data(0, yc), width, hc,
+            width * hc, HDFF_COLOR_TYPE_CLUT8, mBitmapPalette);
     }
-    mHdffCmdIf->CmdOsdDrawBitmap(mDisplay, mLeft + x, mTop + y,
-        (uint8_t *) tmpBitmap, Bitmap.Width(), Bitmap.Height(),
-        Bitmap.Width() * Bitmap.Height() * 4, HDFF::colorTypeARGB8888, InvalidHandle);
-    delete[] tmpBitmap;
-#endif
     mChanged = true;
     mBitmapModified = false;
 }
