@@ -40,7 +40,6 @@ private:
     int mDispHeight;
     bool shown;
     bool mChanged;
-    bool mBitmapModified;
     uint32_t mDisplay;
     tFontFace mFontFaces[MAX_NUM_FONTFACES];
     tFont mFonts[MAX_NUM_FONTS];
@@ -53,7 +52,6 @@ protected:
 public:
     cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level);
     virtual ~cHdffOsd();
-    cBitmap *GetBitmap(int Area);
     virtual eOsdError CanHandleAreas(const tArea *Areas, int NumAreas);
     virtual eOsdError SetAreas(const tArea *Areas, int NumAreas);
     virtual void SaveRegion(int x1, int y1, int x2, int y2);
@@ -79,7 +77,6 @@ cHdffOsd::cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level)
     mTop = Top;
     shown = false;
     mChanged = false;
-    mBitmapModified = false;
     mBitmapPalette = HDFF_INVALID_HANDLE;
     config.FontKerning = false;
     config.FontAntialiasing = Setup.AntiAlias ? true : false;
@@ -126,14 +123,6 @@ cHdffOsd::~cHdffOsd()
     mHdffCmdIf->CmdOsdDeleteDisplay(mDisplay);
 }
 
-cBitmap * cHdffOsd::GetBitmap(int Area)
-{
-    //printf("GetBitmap %d\n", Area);
-    mChanged = true;
-    mBitmapModified = true;
-    return cOsd::GetBitmap(Area);
-}
-
 eOsdError cHdffOsd::CanHandleAreas(const tArea *Areas, int NumAreas)
 {
     eOsdError Result = cOsd::CanHandleAreas(Areas, NumAreas);
@@ -150,6 +139,9 @@ eOsdError cHdffOsd::CanHandleAreas(const tArea *Areas, int NumAreas)
 
 eOsdError cHdffOsd::SetAreas(const tArea *Areas, int NumAreas)
 {
+    eOsdError error;
+    cBitmap * bitmap;
+
     for (int i = 0; i < NumAreas; i++)
     {
         //printf("SetAreas %d: %d %d %d %d %d\n", i, Areas[i].x1, Areas[i].y1, Areas[i].x2, Areas[i].y2, Areas[i].bpp);
@@ -160,7 +152,14 @@ eOsdError cHdffOsd::SetAreas(const tArea *Areas, int NumAreas)
         mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
         shown = false;
     }
-    return cOsd::SetAreas(Areas, NumAreas);
+    error = cOsd::SetAreas(Areas, NumAreas);
+
+    for (int i = 0; (bitmap = GetBitmap(i)) != NULL; i++)
+    {
+        bitmap->Clean();
+    }
+
+    return error;
 }
 
 void cHdffOsd::SetActive(bool On)
@@ -186,25 +185,22 @@ void cHdffOsd::SaveRegion(int x1, int y1, int x2, int y2)
 {
     mHdffCmdIf->CmdOsdSaveRegion(mDisplay, mLeft + x1, mTop + y1, x2 - x1 + 1, y2 - y1 + 1);
     mChanged = true;
-    mBitmapModified = false;
 }
 
 void cHdffOsd::RestoreRegion(void)
 {
     mHdffCmdIf->CmdOsdRestoreRegion(mDisplay);
     mChanged = true;
-    mBitmapModified = false;
 }
 
 void cHdffOsd::DrawPixel(int x, int y, tColor Color)
 {
     //printf("DrawPixel\n");
-    mBitmapModified = false;
 }
 
 void cHdffOsd::DrawBitmap(int x, int y, const cBitmap &Bitmap, tColor ColorFg, tColor ColorBg, bool ReplacePalette, bool Overlay)
 {
-    //printf("DrawBitmap %d %d %d\n", x, y, Overlay);
+    //printf("DrawBitmap %d %d %d x %d\n", x, y, Bitmap.Width(), Bitmap.Height());
     int i;
     int numColors;
     const tColor * colors = Bitmap.Colors(numColors);
@@ -245,7 +241,6 @@ void cHdffOsd::DrawBitmap(int x, int y, const cBitmap &Bitmap, tColor ColorFg, t
             width * hc, HDFF_COLOR_TYPE_CLUT8, mBitmapPalette);
     }
     mChanged = true;
-    mBitmapModified = false;
 }
 
 void cHdffOsd::DrawText(int x, int y, const char *s, tColor ColorFg, tColor ColorBg, const cFont *Font, int Width, int Height, int Alignment)
@@ -398,14 +393,12 @@ void cHdffOsd::DrawText(int x, int y, const char *s, tColor ColorFg, tColor Colo
     mHdffCmdIf->CmdOsdSetDisplayClippingArea(mDisplay, false, 0, 0, 0, 0);
     //Font->DrawText(this, x, y, s, ColorFg, ColorBg, limit);
     mChanged = true;
-    mBitmapModified = false;
 }
 
 void cHdffOsd::DrawRectangle(int x1, int y1, int x2, int y2, tColor Color)
 {
     mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, mLeft + x1, mTop + y1, x2 - x1 + 1, y2 - y1 + 1, Color);
     mChanged = true;
-    mBitmapModified = false;
 }
 
 void cHdffOsd::DrawEllipse(int x1, int y1, int x2, int y2, tColor Color, int Quadrants)
@@ -496,14 +489,12 @@ void cHdffOsd::DrawEllipse(int x1, int y1, int x2, int y2, tColor Color, int Qua
     }
     mHdffCmdIf->CmdOsdDrawEllipse(mDisplay, mLeft + cx, mTop + cy, rx, ry, Color, flags);
     mChanged = true;
-    mBitmapModified = false;
 }
 
 void cHdffOsd::DrawSlope(int x1, int y1, int x2, int y2, tColor Color, int Type)
 {
     //printf("DrawSlope\n");
     mChanged = true;
-    mBitmapModified = false;
 }
 
 void cHdffOsd::Flush(void)
@@ -511,23 +502,30 @@ void cHdffOsd::Flush(void)
     if (!Active())
         return;
 
-    if (!mChanged)
-        return;
-
     //printf("Flush\n");
-    if (mBitmapModified)
+    cBitmap * Bitmap;
+
+    for (int i = 0; (Bitmap = GetBitmap(i)) != NULL; i++)
     {
-        cBitmap *Bitmap;
-        for (int i = 0; (Bitmap = GetBitmap(i)) != NULL; i++)
+        int x1;
+        int y1;
+        int x2;
+        int y2;
+
+        if (Bitmap->Dirty(x1, y1, x2, y2))
         {
+            //printf("dirty %d %d, %d %d\n", x1, y1, x2, y2);
             DrawBitmap(0, 0, *Bitmap);
+            Bitmap->Clean();
         }
     }
+
+    if (!mChanged)
+        return;
 
     mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
 
     mChanged = false;
-    mBitmapModified = false;
 }
 
 
