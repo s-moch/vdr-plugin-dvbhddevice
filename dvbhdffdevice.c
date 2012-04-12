@@ -50,7 +50,7 @@ cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend)
      mHdffCmdIf = new HDFF::cHdffCmdIf(fd_osd);
 
      /* reset some stuff in case the VDR was killed before and had no chance
-	to clean up. */
+        to clean up. */
      mHdffCmdIf->CmdOsdReset();
 
      mHdffCmdIf->CmdAvSetVideoSpeed(0, 100);
@@ -183,15 +183,6 @@ void cDvbHdFfDevice::GetOsdSize(int &Width, int &Height, double &PixelAspect)
   gHdffSetup.GetOsdSize(Width, Height, PixelAspect);
 }
 
-/*TODO obsolete?
-bool cDvbHdFfDevice::SetAudioBypass(bool On)
-{
-  if (setTransferModeForDolbyDigital != 1)
-     return false;
-  return ioctl(fd_audio, AUDIO_SET_BYPASS_MODE, On) == 0;
-}
-TODO*/
-
 bool cDvbHdFfDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 {
   if (Handle->pid) {
@@ -301,13 +292,10 @@ bool cDvbHdFfDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
   // PID settings:
 
   if (TurnOnLivePIDs) {
-     //SetAudioBypass(false);//TODO obsolete?
      if (!(AddPid(Channel->Ppid(), ptPcr) && AddPid(vpid, ptVideo, Channel->Vtype()) && AddPid(apid, ptAudio))) {
         esyslog("ERROR: failed to set PIDs for channel %d on device %d", Channel->Number(), CardIndex() + 1);
         return false;
         }
-     if (IsPrimaryDevice())
-        AddPid(Channel->Tpid(), ptTeletext);//TODO obsolete?
      }
   else if (StartTransferMode)
      cControl::Launch(new cTransferControl(this, Channel));
