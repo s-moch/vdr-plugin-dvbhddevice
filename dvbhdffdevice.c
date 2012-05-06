@@ -185,6 +185,7 @@ void cDvbHdFfDevice::GetOsdSize(int &Width, int &Height, double &PixelAspect)
 
 bool cDvbHdFfDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 {
+    //printf("SetPid Type %d, On %d, PID %5d, streamtype %d, handle %d, used %d\n", Type, On, Handle->pid, Handle->streamType, Handle->handle, Handle->used);
     if (Handle->pid) {
         dmx_pes_filter_params pesFilterParams;
         memset(&pesFilterParams, 0, sizeof(pesFilterParams));
@@ -289,6 +290,8 @@ bool cDvbHdFfDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
   if (CamSlot() && !ChannelCamRelations.CamDecrypt(Channel->GetChannelID(), CamSlot()->SlotNumber()))
      StartTransferMode |= LiveView && IsPrimaryDevice() && Channel->Ca() >= CA_ENCRYPTED_MIN;
 
+  //printf("SetChannelDevice Transfer %d, Live %d\n", StartTransferMode, LiveView);
+
   bool TurnOnLivePIDs = !StartTransferMode && LiveView;
 
   // Turn off live PIDs if necessary:
@@ -304,7 +307,7 @@ bool cDvbHdFfDevice::SetChannelDevice(const cChannel *Channel, bool LiveView)
   // PID settings:
 
   if (TurnOnLivePIDs) {
-     if (!(AddPid(Channel->Ppid(), ptPcr) && AddPid(vpid, ptVideo, Channel->Vtype()) && AddPid(apid, ptAudio))) {
+     if (!(AddPid(Channel->Ppid(), ptPcr) && AddPid(vpid, ptVideo, Channel->Vtype()) && AddPid(apid ? apid : dpid, ptAudio, apid ? 0 : Channel->Dtype(0)))) {
         esyslog("ERROR: failed to set PIDs for channel %d on device %d", Channel->Number(), CardIndex() + 1);
         return false;
         }
@@ -349,12 +352,11 @@ void cDvbHdFfDevice::SetAudioTrackDevice(eTrackType Type)
             else if (IS_DOLBY_TRACK(Type))
                 streamType = channel->Dtype(Type - ttDolbyFirst);
         }
-        if (pidHandles[ptAudio].pid != TrackId->id) {
-            if (pidHandles[ptAudio].pid) {
-                DetachAll(pidHandles[ptAudio].pid);
-                if (CamSlot())
-                    CamSlot()->SetPid(pidHandles[ptAudio].pid, false);
-            }
+        //printf("SetAudioTrackDevice new %d %d, current %d\n", TrackId->id, streamType, pidHandles[ptAudio].pid);
+        if (pidHandles[ptAudio].pid && pidHandles[ptAudio].pid != TrackId->id) {
+            DetachAll(pidHandles[ptAudio].pid);
+            if (CamSlot())
+                CamSlot()->SetPid(pidHandles[ptAudio].pid, false);
             pidHandles[ptAudio].pid = TrackId->id;
             pidHandles[ptAudio].streamType = streamType;
             SetPid(&pidHandles[ptAudio], ptAudio, true);
