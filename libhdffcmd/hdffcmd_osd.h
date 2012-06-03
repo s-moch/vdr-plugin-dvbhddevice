@@ -149,6 +149,10 @@ int HdffCmdOsdDrawText(int OsdDevice, uint32_t Display, uint32_t Font,
                        uint16_t X, uint16_t Y, const char * Text,
                        uint32_t Color);
 
+int HdffCmdOsdDrawUtf8Text(int OsdDevice, uint32_t Display, uint32_t Font,
+                           uint16_t X, uint16_t Y, const char * Text,
+                           uint32_t Color);
+
 int HdffCmdOsdDrawWideText(int OsdDevice, uint32_t Display, uint32_t Font,
                            uint16_t X, uint16_t Y, const uint16_t * Text,
                            uint32_t Color);
