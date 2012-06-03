@@ -310,6 +310,12 @@ void cHdffCmdIf::CmdOsdDrawText(uint32_t hDisplay, uint32_t hFont, int X, int Y,
     HdffCmdOsdDrawText(mOsdDev, hDisplay, hFont, X, Y, pText, Color);
 }
 
+void cHdffCmdIf::CmdOsdDrawUtf8Text(uint32_t hDisplay, uint32_t hFont, int X, int Y, const char * pText, uint32_t Color)
+{
+    //printf("Text(UTF8) %08X (%d,%d), %s, %08X\n", hFont, X, Y, pText, Color);
+    HdffCmdOsdDrawUtf8Text(mOsdDev, hDisplay, hFont, X, Y, pText, Color);
+}
+
 void cHdffCmdIf::CmdOsdDrawTextW(uint32_t hDisplay, uint32_t hFont, int X, int Y, const uint16_t * pText, uint32_t Color)
 {
     //printf("TextW %08X (%d,%d), %08X\n", hFont, X, Y, Color);

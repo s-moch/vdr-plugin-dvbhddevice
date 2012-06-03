@@ -47,6 +47,8 @@ private:
     uint32_t mBitmapColors[256];
     uint32_t mBitmapNumColors;
 
+    bool mSupportsUtf8Text;
+
 protected:
     virtual void SetActive(bool On);
 public:
@@ -78,6 +80,10 @@ cHdffOsd::cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level)
     shown = false;
     mChanged = false;
     mBitmapPalette = HDFF_INVALID_HANDLE;
+
+    mSupportsUtf8Text = false;
+    if (mHdffCmdIf->CmdGetFirmwareVersion(NULL, 0) >= 0x309)
+        mSupportsUtf8Text = true;
 
     memset(&config, 0, sizeof(config));
     config.FontKerning = true;
@@ -384,8 +390,11 @@ void cHdffOsd::DrawText(int x, int y, const char *s, tColor ColorFg, tColor Colo
             }
         }
     }
-    //x -= mLeft;
-    //y -= mTop;
+    if (mSupportsUtf8Text)
+    {
+        mHdffCmdIf->CmdOsdDrawUtf8Text(mDisplay, pFont->Handle, x + mLeft, y + mTop + h, s, ColorFg);
+    }
+    else
     {
         uint16_t tmp[1000];
         uint16_t len = 0;
@@ -400,9 +409,7 @@ void cHdffOsd::DrawText(int x, int y, const char *s, tColor ColorFg, tColor Colo
         tmp[len] = 0;
         mHdffCmdIf->CmdOsdDrawTextW(mDisplay, pFont->Handle, x + mLeft, y + mTop + h, tmp, ColorFg);
     }
-    //mHdffCmdIf->CmdOsdDrawText(mDisplay, pFont->Handle, x + mLeft, y + mTop + h - 7, s, ColorFg);
     mHdffCmdIf->CmdOsdSetDisplayClippingArea(mDisplay, false, 0, 0, 0, 0);
-    //Font->DrawText(this, x, y, s, ColorFg, ColorBg, limit);
     mChanged = true;
 }
 
