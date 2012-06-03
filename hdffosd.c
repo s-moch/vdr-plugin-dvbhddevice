@@ -78,7 +78,7 @@ cHdffOsd::cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level)
     shown = false;
     mChanged = false;
     mBitmapPalette = HDFF_INVALID_HANDLE;
-    config.FontKerning = false;
+    config.FontKerning = true;
     config.FontAntialiasing = Setup.AntiAlias ? true : false;
     mHdffCmdIf->CmdOsdConfigure(&config);
 
