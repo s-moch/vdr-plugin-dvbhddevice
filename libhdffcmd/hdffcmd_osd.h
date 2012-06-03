@@ -40,6 +40,7 @@ typedef struct HdffOsdConfig_t
 {
     int FontAntialiasing;
     int FontKerning;
+    uint16_t FontDpi;
 } HdffOsdConfig_t;
 
 typedef enum HdffColorType_t

@@ -57,6 +57,8 @@ int HdffCmdOsdConfigure(int OsdDevice, const HdffOsdConfig_t * Config)
     {
         BitBuffer_SetBits(&cmdBuf, 1, 0);
     }
+    BitBuffer_SetBits(&cmdBuf, 6, 0); // reserved
+    BitBuffer_SetBits(&cmdBuf, 16, Config->FontDpi);
     osd_cmd.cmd_len = HdffCmdSetLength(&cmdBuf);
     return ioctl(OsdDevice, OSD_RAW_CMD, &osd_cmd);
 }
