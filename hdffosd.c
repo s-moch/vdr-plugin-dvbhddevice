@@ -345,11 +345,20 @@ void cHdffOsd::DrawText(int x, int y, const char *s, tColor ColorFg, tColor Colo
         if (Width)
         {
             if ((Alignment & taLeft) != 0)
-                ;
+            {
+#if (APIVERSNUM >= 10728)
+                if ((Alignment & taBorder) != 0)
+                    x += max(h / TEXT_ALIGN_BORDER, 1);
+#endif
+            }
             else if ((Alignment & taRight) != 0)
             {
                 if (w < Width)
                     x += Width - w;
+#if (APIVERSNUM >= 10728)
+                if ((Alignment & taBorder) != 0)
+                    x -= max(h / TEXT_ALIGN_BORDER, 1);
+#endif
             }
             else
             { // taCentered
