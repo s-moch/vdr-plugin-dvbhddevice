@@ -52,7 +52,7 @@ void cPluginDvbhddevice::MainThreadHook(void)
         if (gHdffSetup.CecEnabled && gHdffSetup.CecTvOn)
         {
             HDFF::cHdffCmdIf * hdffCmdIf = cDvbHdFfDevice::GetHdffCmdHandler();
-            if (!mIsUserInactive)
+            if (hdffCmdIf && !mIsUserInactive)
             {
                 hdffCmdIf->CmdHdmiSendCecCommand(HDFF_CEC_COMMAND_TV_ON);
             }
@@ -67,12 +67,14 @@ const char *cPluginDvbhddevice::MainMenuEntry(void)
 
 cOsdObject *cPluginDvbhddevice::MainMenuAction(void)
 {
-  return new cHdffMenu(cDvbHdFfDevice::GetHdffCmdHandler());
+  HDFF::cHdffCmdIf * hdffCmdIf = cDvbHdFfDevice::GetHdffCmdHandler();
+  return hdffCmdIf ? new cHdffMenu(hdffCmdIf) : NULL;
 }
 
 cMenuSetupPage *cPluginDvbhddevice::SetupMenu(void)
 {
-  return new cHdffSetupPage(cDvbHdFfDevice::GetHdffCmdHandler());
+  HDFF::cHdffCmdIf * hdffCmdIf = cDvbHdFfDevice::GetHdffCmdHandler();
+  return hdffCmdIf ? new cHdffSetupPage(hdffCmdIf) : NULL;
 }
 
 bool cPluginDvbhddevice::SetupParse(const char *Name, const char *Value)
