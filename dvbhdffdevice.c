@@ -136,7 +136,7 @@ void cDvbHdFfDevice::SetVideoFormat(bool VideoFormat16_9)
 {
   HdffVideoFormat_t videoFormat;
   videoFormat.AutomaticEnabled = true;
-  videoFormat.AfdEnabled = true;
+  videoFormat.AfdEnabled = false;
   videoFormat.TvFormat = (HdffTvFormat_t) gHdffSetup.TvFormat;
   videoFormat.VideoConversion = (HdffVideoConversion_t) gHdffSetup.VideoConversion;
   mHdffCmdIf->CmdAvSetVideoFormat(0, &videoFormat);
