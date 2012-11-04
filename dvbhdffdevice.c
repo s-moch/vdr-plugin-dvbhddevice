@@ -661,8 +661,6 @@ int cDvbHdFfDevice::PlayAudio(const uchar *Data, int Length, uchar Id)
 {
     if (freezed)
         return -1;
-    if (trickMode)
-        return Length;
     uint8_t streamId;
     uint8_t tsBuffer[188 * 16];
     uint32_t tsLength;
@@ -744,8 +742,6 @@ int cDvbHdFfDevice::PlayTsAudio(const uchar *Data, int Length)
 {
   if (freezed)
     return -1;
-  if (trickMode)
-    return Length;
   int pid = TsPid(Data);
   if (pid != playAudioPid) {
      playAudioPid = pid;
