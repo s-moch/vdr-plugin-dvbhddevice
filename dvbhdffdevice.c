@@ -395,7 +395,7 @@ bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
 
         mHdffCmdIf->CmdAvSetPlayMode(1, Transferring() || (cTransferControl::ReceiverDevice() == this));
         mHdffCmdIf->CmdAvSetStc(0, 100000);
-        mHdffCmdIf->CmdAvEnableSync(0, true);
+        mHdffCmdIf->CmdAvEnableSync(0, false);
         mHdffCmdIf->CmdAvEnableVideoAfterStop(0, true);
 
         playVideoPid = -1;
@@ -465,12 +465,13 @@ void cDvbHdFfDevice::Clear(void)
 
 void cDvbHdFfDevice::Play(void)
 {
-  freezed = false;
-  trickMode = false;
-  mHdffCmdIf->CmdAvEnableSync(0, true);
-  mHdffCmdIf->CmdAvSetVideoSpeed(0, 100);
-  mHdffCmdIf->CmdAvSetAudioSpeed(0, 100);
-  cDevice::Play();
+    freezed = false;
+    trickMode = false;
+    if (isPlayingVideo)
+        mHdffCmdIf->CmdAvEnableSync(0, true);
+    mHdffCmdIf->CmdAvSetVideoSpeed(0, 100);
+    mHdffCmdIf->CmdAvSetAudioSpeed(0, 100);
+    cDevice::Play();
 }
 
 void cDvbHdFfDevice::Freeze(void)
@@ -640,7 +641,11 @@ int cDvbHdFfDevice::PlayVideo(const uchar *Data, int Length)
 {
     if (freezed)
         return -1;
-    isPlayingVideo = true;
+    if (!isPlayingVideo)
+    {
+        mHdffCmdIf->CmdAvEnableSync(0, true);
+        isPlayingVideo = true;
+    }
     //TODO: support greater Length
     uint8_t tsBuffer[188 * 16];
     uint32_t tsLength;
@@ -712,7 +717,11 @@ int cDvbHdFfDevice::PlayTsVideo(const uchar *Data, int Length)
 {
     if (freezed)
         return -1;
-    isPlayingVideo = true;
+    if (!isPlayingVideo)
+    {
+        mHdffCmdIf->CmdAvEnableSync(0, true);
+        isPlayingVideo = true;
+    }
 
     int pid = TsPid(Data);
     if (pid != playVideoPid) {
