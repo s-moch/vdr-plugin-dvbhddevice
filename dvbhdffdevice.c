@@ -375,62 +375,71 @@ bool cDvbHdFfDevice::CanReplay(void) const
 
 bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
 {
-  if (PlayMode == pmNone) {
-     mHdffCmdIf->CmdAvSetVideoSpeed(0, 100);
-     mHdffCmdIf->CmdAvSetAudioSpeed(0, 100);
+    if (PlayMode == pmNone) {
+        mHdffCmdIf->CmdAvSetVideoSpeed(0, 100);
+        mHdffCmdIf->CmdAvSetAudioSpeed(0, 100);
 
-     mHdffCmdIf->CmdAvEnableVideoAfterStop(0, false);
-     mHdffCmdIf->CmdAvSetPcrPid(0, 0);
-     mHdffCmdIf->CmdAvSetVideoPid(0, 0, HDFF_VIDEO_STREAM_MPEG1);
-     mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_MPEG1);
+        mHdffCmdIf->CmdAvEnableVideoAfterStop(0, false);
+        mHdffCmdIf->CmdAvSetPcrPid(0, 0);
+        mHdffCmdIf->CmdAvSetVideoPid(0, 0, HDFF_VIDEO_STREAM_MPEG1);
+        mHdffCmdIf->CmdAvSetAudioPid(0, 0, HDFF_AUDIO_STREAM_MPEG1);
 
-     ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_DEMUX);
-     mHdffCmdIf->CmdAvSetDecoderInput(0, 0);
-     mHdffCmdIf->CmdAvEnableSync(0, true);
-     mHdffCmdIf->CmdAvSetPlayMode(0, true);
-     }
-  else {
-     if (playMode == pmNone)
-        TurnOffLiveMode(true);
+        ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_DEMUX);
+        mHdffCmdIf->CmdAvSetDecoderInput(0, 0);
+        mHdffCmdIf->CmdAvEnableSync(0, true);
+        mHdffCmdIf->CmdAvSetPlayMode(0, true);
+    }
+    else {
+        if (playMode == pmNone)
+            TurnOffLiveMode(true);
 
-     mHdffCmdIf->CmdAvSetPlayMode(1, Transferring() || (cTransferControl::ReceiverDevice() == this));
-     mHdffCmdIf->CmdAvSetStc(0, 100000);
-     mHdffCmdIf->CmdAvEnableSync(0, true);
-     mHdffCmdIf->CmdAvEnableVideoAfterStop(0, true);
+        mHdffCmdIf->CmdAvSetPlayMode(1, Transferring() || (cTransferControl::ReceiverDevice() == this));
+        mHdffCmdIf->CmdAvSetStc(0, 100000);
+        mHdffCmdIf->CmdAvEnableSync(0, true);
+        mHdffCmdIf->CmdAvEnableVideoAfterStop(0, true);
 
-     playVideoPid = -1;
-     playAudioPid = -1;
-     audioCounter = 0;
-     videoCounter = 0;
-     freezed = false;
-     trickMode = false;
+        playVideoPid = -1;
+        playAudioPid = -1;
+        audioCounter = 0;
+        videoCounter = 0;
+        freezed = false;
+        trickMode = false;
+        isPlayingVideo = false;
 
-     mHdffCmdIf->CmdAvSetDecoderInput(0, 2);
-     ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_MEMORY);
-     }
-  playMode = PlayMode;
-  return true;
+        mHdffCmdIf->CmdAvSetDecoderInput(0, 2);
+        ioctl(fd_video, VIDEO_SELECT_SOURCE, VIDEO_SOURCE_MEMORY);
+    }
+    playMode = PlayMode;
+    return true;
 }
 
 int64_t cDvbHdFfDevice::GetSTC(void)
 {
-  if (fd_video >= 0) {
-     uint64_t pts;
-     if (ioctl(fd_video, VIDEO_GET_PTS, &pts) == -1) {
-        esyslog("ERROR: pts %d: %m", CardIndex() + 1);
-        return -1;
+    if (isPlayingVideo)
+    {
+        if (fd_video >= 0) {
+            uint64_t pts;
+            if (ioctl(fd_video, VIDEO_GET_PTS, &pts) == -1) {
+                esyslog("ERROR: pts %d: %m", CardIndex() + 1);
+                return -1;
+            }
+            //printf("video PTS %lld\n", pts);
+            return pts;
         }
-     return pts;
-     }
-  if (fd_audio >= 0) {
-     uint64_t pts;
-     if (ioctl(fd_audio, AUDIO_GET_PTS, &pts) == -1) {
-        esyslog("ERROR: pts %d: %m", CardIndex() + 1);
-        return -1;
+    }
+    else
+    {
+        if (fd_audio >= 0) {
+            uint64_t pts;
+            if (ioctl(fd_audio, AUDIO_GET_PTS, &pts) == -1) {
+                esyslog("ERROR: pts %d: %m", CardIndex() + 1);
+                return -1;
+            }
+            //printf("audio PTS %lld\n", pts);
+            return pts;
         }
-     return pts;
-     }
-  return -1;
+    }
+    return -1;
 }
 
 void cDvbHdFfDevice::TrickSpeed(int Speed)
@@ -631,6 +640,7 @@ int cDvbHdFfDevice::PlayVideo(const uchar *Data, int Length)
 {
     if (freezed)
         return -1;
+    isPlayingVideo = true;
     //TODO: support greater Length
     uint8_t tsBuffer[188 * 16];
     uint32_t tsLength;
@@ -702,17 +712,19 @@ int cDvbHdFfDevice::PlayAudio(const uchar *Data, int Length, uchar Id)
 
 int cDvbHdFfDevice::PlayTsVideo(const uchar *Data, int Length)
 {
-  if (freezed)
-    return -1;
-  int pid = TsPid(Data);
-  if (pid != playVideoPid) {
-     PatPmtParser();
-     if (pid == PatPmtParser()->Vpid()) {
-        playVideoPid = pid;
-        mHdffCmdIf->CmdAvSetVideoPid(0, playVideoPid, MapVideoStreamTypes(PatPmtParser()->Vtype()), true);
+    if (freezed)
+        return -1;
+    isPlayingVideo = true;
+
+    int pid = TsPid(Data);
+    if (pid != playVideoPid) {
+        PatPmtParser();
+        if (pid == PatPmtParser()->Vpid()) {
+            playVideoPid = pid;
+            mHdffCmdIf->CmdAvSetVideoPid(0, playVideoPid, MapVideoStreamTypes(PatPmtParser()->Vtype()), true);
         }
-     }
-  return WriteAllOrNothing(fd_video, Data, Length, 1000, 10);
+    }
+    return WriteAllOrNothing(fd_video, Data, Length, 1000, 10);
 }
 
 static HdffAudioStreamType_t MapAudioStreamTypes(int Atype)
