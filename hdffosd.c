@@ -390,11 +390,13 @@ void cHdffOsd::DrawText(int x, int y, const char *s, tColor ColorFg, tColor Colo
             }
         }
     }
+#if 0
     if (mSupportsUtf8Text)
     {
         mHdffCmdIf->CmdOsdDrawUtf8Text(mDisplay, pFont->Handle, x + mLeft, y + mTop + h, s, ColorFg);
     }
     else
+#endif
     {
         uint16_t tmp[1000];
         uint16_t len = 0;
