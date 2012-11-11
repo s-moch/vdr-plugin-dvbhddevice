@@ -9,7 +9,6 @@
 #ifndef _HDFF_CMD_H_
 #define _HDFF_CMD_H_
 
-#include "bitbuffer.h"
 #include "libhdffcmd/hdffcmd.h"
 
 namespace HDFF
@@ -75,6 +74,7 @@ public:
     void CmdOsdDrawEllipse(uint32_t hDisplay, int CX, int CY, int RadiusX, int RadiusY,
                            uint32_t Color, uint32_t Flags);
     void CmdOsdDrawText(uint32_t hDisplay, uint32_t hFont, int X, int Y, const char * pText, uint32_t Color);
+    void CmdOsdDrawUtf8Text(uint32_t hDisplay, uint32_t hFont, int X, int Y, const char * pText, uint32_t Color);
     void CmdOsdDrawTextW(uint32_t hDisplay, uint32_t hFont, int X, int Y, const uint16_t * pText, uint32_t Color);
     void CmdOsdDrawBitmap(uint32_t hDisplay, int X, int Y, const uint8_t * pBitmap,
                           int BmpWidth, int BmpHeight, int BmpSize,

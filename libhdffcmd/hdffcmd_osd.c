@@ -57,6 +57,8 @@ int HdffCmdOsdConfigure(int OsdDevice, const HdffOsdConfig_t * Config)
     {
         BitBuffer_SetBits(&cmdBuf, 1, 0);
     }
+    BitBuffer_SetBits(&cmdBuf, 6, 0); // reserved
+    BitBuffer_SetBits(&cmdBuf, 16, Config->FontDpi);
     osd_cmd.cmd_len = HdffCmdSetLength(&cmdBuf);
     return ioctl(OsdDevice, OSD_RAW_CMD, &osd_cmd);
 }
@@ -103,10 +105,15 @@ int HdffCmdOsdCreateDisplay(int OsdDevice, uint16_t Width, uint16_t Height,
     {
         if (osd_cmd.result_len > 0)
         {
-            *NewDisplay = (resultData[6] << 24)
-                        | (resultData[7] << 16)
-                        | (resultData[8] << 8)
-                        | resultData[9];
+            if (resultData[2] == HDFF_MSG_TYPE_ANSWER)
+            {
+                *NewDisplay = (resultData[6] << 24)
+                            | (resultData[7] << 16)
+                            | (resultData[8] << 8)
+                            | resultData[9];
+            }
+            else
+                err = -1;
         }
     }
     return err;
@@ -295,10 +302,15 @@ int HdffCmdOsdCreatePalette(int OsdDevice, HdffColorType_t ColorType,
     {
         if (osd_cmd.result_len > 0)
         {
-            *NewPalette = (resultData[6] << 24)
-                        | (resultData[7] << 16)
-                        | (resultData[8] << 8)
-                        | resultData[9];
+            if (resultData[2] == HDFF_MSG_TYPE_ANSWER)
+            {
+                *NewPalette = (resultData[6] << 24)
+                            | (resultData[7] << 16)
+                            | (resultData[8] << 8)
+                            | resultData[9];
+            }
+            else
+                err = -1;
         }
     }
     return err;
@@ -400,10 +412,15 @@ int HdffCmdOsdCreateFontFace(int OsdDevice, const uint8_t * FontData,
     {
         if (osd_cmd.result_len > 0)
         {
-            *NewFontFace = (resultData[6] << 24)
-                         | (resultData[7] << 16)
-                         | (resultData[8] << 8)
-                         | resultData[9];
+            if (resultData[2] == HDFF_MSG_TYPE_ANSWER)
+            {
+                *NewFontFace = (resultData[6] << 24)
+                             | (resultData[7] << 16)
+                             | (resultData[8] << 8)
+                             | resultData[9];
+            }
+            else
+                err = -1;
         }
     }
     return err;
@@ -451,10 +468,15 @@ int HdffCmdOsdCreateFont(int OsdDevice, uint32_t FontFace, uint32_t Size,
     {
         if (osd_cmd.result_len > 0)
         {
-            *NewFont = (resultData[6] << 24)
-                     | (resultData[7] << 16)
-                     | (resultData[8] << 8)
-                     | resultData[9];
+            if (resultData[2] == HDFF_MSG_TYPE_ANSWER)
+            {
+                *NewFont = (resultData[6] << 24)
+                         | (resultData[7] << 16)
+                         | (resultData[8] << 8)
+                         | resultData[9];
+            }
+            else
+                err = -1;
         }
     }
     return err;
@@ -547,6 +569,43 @@ int HdffCmdOsdDrawText(int OsdDevice, uint32_t Display, uint32_t Font,
     osd_cmd.cmd_data = cmdData;
     HdffCmdBuildHeader(&cmdBuf, HDFF_MSG_TYPE_COMMAND, HDFF_MSG_GROUP_OSD,
                        HDFF_MSG_OSD_DRAW_TEXT);
+    BitBuffer_SetBits(&cmdBuf, 32, Display);
+    BitBuffer_SetBits(&cmdBuf, 32, Font);
+    BitBuffer_SetBits(&cmdBuf, 16, X);
+    BitBuffer_SetBits(&cmdBuf, 16, Y);
+    BitBuffer_SetBits(&cmdBuf, 32, Color);
+    BitBuffer_SetBits(&cmdBuf, 16, length);
+    for (i = 0; i < length; i++)
+    {
+        BitBuffer_SetBits(&cmdBuf, 8, Text[i]);
+    }
+    osd_cmd.cmd_len = HdffCmdSetLength(&cmdBuf);
+    return ioctl(OsdDevice, OSD_RAW_CMD, &osd_cmd);
+}
+
+int HdffCmdOsdDrawUtf8Text(int OsdDevice, uint32_t Display, uint32_t Font,
+                           uint16_t X, uint16_t Y, const char * Text,
+                           uint32_t Color)
+{
+    uint8_t cmdData[1060];
+    BitBuffer_t cmdBuf;
+    osd_raw_cmd_t osd_cmd;
+    int i;
+    int length;
+
+    length = 0;
+    while (Text[length])
+    {
+        length++;
+    }
+    if (length > 980)
+        length = 980;
+
+    BitBuffer_Init(&cmdBuf, cmdData, sizeof(cmdData));
+    memset(&osd_cmd, 0, sizeof(osd_raw_cmd_t));
+    osd_cmd.cmd_data = cmdData;
+    HdffCmdBuildHeader(&cmdBuf, HDFF_MSG_TYPE_COMMAND, HDFF_MSG_GROUP_OSD,
+                       HDFF_MSG_OSD_DRAW_UTF8_TEXT);
     BitBuffer_SetBits(&cmdBuf, 32, Display);
     BitBuffer_SetBits(&cmdBuf, 32, Font);
     BitBuffer_SetBits(&cmdBuf, 16, X);

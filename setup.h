@@ -18,6 +18,8 @@ struct cHdffSetup
     bool SetupParse(const char * Name, const char * Value);
     void GetOsdSize(int &Width, int &Height, double &PixelAspect);
     HdffVideoMode_t GetVideoMode(void);
+    void SetNextVideoConversion(void);
+    const char * GetVideoConversionString(void);
 
     int Resolution;
     int VideoModeAdaption;
@@ -28,11 +30,15 @@ struct cHdffSetup
     int AudioDownmix;
     int OsdSize;
     int CecEnabled;
+    int CecTvOn;
+    int CecTvOff;
     int RemoteProtocol;
     int RemoteAddress;
 
     int HighLevelOsd;
     int TrueColorOsd;
+
+    int HideMainMenu;
 };
 
 extern cHdffSetup gHdffSetup;
@@ -42,6 +48,10 @@ class cHdffSetupPage : public cMenuSetupPage
 private:
     HDFF::cHdffCmdIf * mHdffCmdIf;
     cHdffSetup mNewHdffSetup;
+    cOsdItem * mTvFormatItem;
+    int mVideoConversion;
+
+    void BuildVideoConversionItem(void);
 
 protected:
     virtual void Store(void);
@@ -49,6 +59,7 @@ protected:
 public:
     cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf);
     virtual ~cHdffSetupPage(void);
+    virtual eOSState ProcessKey(eKeys Key);
 };
 
 #endif
