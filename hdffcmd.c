@@ -170,6 +170,11 @@ void cHdffCmdIf::CmdAvSetAudioChannel(uint8_t AudioChannel)
     HdffCmdAvSetAudioChannel(mOsdDev, AudioChannel);
 }
 
+void cHdffCmdIf::CmdAvSetSyncShift(int16_t SyncShift)
+{
+    HdffCmdAvSetSyncShift(mOsdDev, SyncShift);
+}
+
 
 void cHdffCmdIf::CmdOsdConfigure(const HdffOsdConfig_t * pConfig)
 {

@@ -47,6 +47,7 @@ public:
     void CmdAvSetAudioDelay(int16_t Delay);
     void CmdAvSetAudioDownmix(HdffAudioDownmixMode_t DownmixMode);
     void CmdAvSetAudioChannel(uint8_t AudioChannel);
+    void CmdAvSetSyncShift(int16_t SyncShift);
 
     void CmdOsdConfigure(const HdffOsdConfig_t * pConfig);
     void CmdOsdReset(void);

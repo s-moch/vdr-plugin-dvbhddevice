@@ -28,6 +28,7 @@ struct cHdffSetup
     int AnalogueVideo;
     int AudioDelay;
     int AudioDownmix;
+    int AvSyncShift;
     int OsdSize;
     int CecEnabled;
     int CecTvOn;

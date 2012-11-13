@@ -69,6 +69,7 @@ cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend)
 
      mHdffCmdIf->CmdAvSetAudioDelay(gHdffSetup.AudioDelay);
      mHdffCmdIf->CmdAvSetAudioDownmix((HdffAudioDownmixMode_t) gHdffSetup.AudioDownmix);
+     mHdffCmdIf->CmdAvSetSyncShift(gHdffSetup.AvSyncShift);
      mHdffCmdIf->CmdMuxSetVideoOut((HdffVideoOut_t) gHdffSetup.AnalogueVideo);
      mHdffCmdIf->CmdHdmiSetVideoMode(gHdffSetup.GetVideoMode());
 
