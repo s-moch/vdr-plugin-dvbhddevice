@@ -1,7 +1,6 @@
 #
 # Makefile for a Video Disk Recorder plugin
 #
-# $Id: Makefile 1.1 2009/12/29 14:11:41 kls Exp $
 
 # The official name of this plugin.
 # This name will be used in the '-P...' option of VDR to load the plugin.
@@ -99,7 +98,7 @@ i18n: $(I18Nmsgs) $(I18Npot)
 ### Targets:
 
 libvdr-$(PLUGIN).so: $(OBJS) libhdffcmd
-	$(MAKE) -C libhdffcmd all
+	$(MAKE) -C libhdffcmd PLUGIN=$(PLUGIN) all
 	$(CXX) $(CXXFLAGS) -shared $(OBJS) libhdffcmd/libhdffcmd.a -o $@
 	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
 
