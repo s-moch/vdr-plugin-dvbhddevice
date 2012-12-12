@@ -2,16 +2,14 @@
  * dvbhdffdevice.h: The DVB HD Full Featured device interface
  *
  * See the README file for copyright information and how to reach the author.
- *
- * $Id: dvbhdffdevice.h 1.2 2010/01/04 11:00:16 kls Exp $
  */
 
 #ifndef __DVBHDFFDEVICE_H
 #define __DVBHDFFDEVICE_H
 
 #include "hdffcmd.h"
-#include "vdr/dvbdevice.h"
-#include "vdr/dvbspu.h"
+#include <vdr/dvbdevice.h>
+#include <vdr/dvbspu.h>
 
 /// The cDvbHdFfDevice implements a DVB device which can be accessed through the Linux DVB driver API.
 
