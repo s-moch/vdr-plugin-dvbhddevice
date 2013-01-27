@@ -94,10 +94,6 @@ cDvbHdFfDevice::~cDvbHdFfDevice()
     delete spuDecoder;
     if (isHdffPrimary)
     {
-        if (gHdffSetup.CecEnabled && gHdffSetup.CecTvOff)
-        {
-            mHdffCmdIf->CmdHdmiSendCecCommand(HDFF_CEC_COMMAND_TV_OFF);
-        }
         delete mHdffCmdIf;
     }
     // We're not explicitly closing any device files here, since this sometimes

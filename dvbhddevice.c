@@ -24,6 +24,7 @@ public:
   virtual const char *Version(void) { return VERSION; }
   virtual const char *Description(void) { return tr(DESCRIPTION); }
   virtual void MainThreadHook(void);
+  virtual void Stop(void);
   virtual const char *MainMenuEntry(void);
   virtual cOsdObject *MainMenuAction(void);
   virtual cMenuSetupPage *SetupMenu(void);
@@ -54,6 +55,19 @@ void cPluginDvbhddevice::MainThreadHook(void)
             {
                 hdffCmdIf->CmdHdmiSendCecCommand(HDFF_CEC_COMMAND_TV_ON);
             }
+        }
+    }
+}
+
+void cPluginDvbhddevice::Stop(void)
+{
+    if (gHdffSetup.CecEnabled && gHdffSetup.CecTvOff)
+    {
+        HDFF::cHdffCmdIf * hdffCmdIf = cDvbHdFfDevice::GetHdffCmdHandler();
+        if (hdffCmdIf)
+        {
+            hdffCmdIf->CmdHdmiSendCecCommand(HDFF_CEC_COMMAND_TV_OFF);
+            isyslog("HDFF_CEC_COMMAND_TV_OFF");
         }
     }
 }
