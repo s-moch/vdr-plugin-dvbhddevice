@@ -36,7 +36,6 @@ private:
     int mTop;
     int mDispWidth;
     int mDispHeight;
-    bool shown;
     bool mChanged;
     uint32_t mDisplay;
     tFontFace mFontFaces[MAX_NUM_FONTFACES];
@@ -75,7 +74,6 @@ cHdffOsd::cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level)
     mHdffCmdIf = pHdffCmdIf;
     mLeft = Left;
     mTop = Top;
-    shown = false;
     mChanged = false;
     mBitmapPalette = HDFF_INVALID_HANDLE;
 
@@ -156,7 +154,6 @@ eOsdError cHdffOsd::SetAreas(const tArea *Areas, int NumAreas)
     {
         mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
         mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
-        shown = false;
     }
     error = cOsd::SetAreas(Areas, NumAreas);
 
@@ -178,11 +175,10 @@ void cHdffOsd::SetActive(bool On)
             if (GetBitmap(0)) // only flush here if there are already bitmaps
                 Flush();
         }
-        else if (shown)
+        else if (mDisplay != HDFF_INVALID_HANDLE)
         {
             mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
             mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
-            shown = false;
         }
     }
 }
