@@ -2,8 +2,6 @@
  * dvbhdffdevice.c: The DVB HD Full Featured device interface
  *
  * See the README file for copyright information and how to reach the author.
- *
- * $Id: dvbhdffdevice.c 1.4 2010/01/04 12:53:47 kls Exp $
  */
 
 #include <stdint.h>

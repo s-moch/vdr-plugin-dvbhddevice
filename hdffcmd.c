@@ -2,8 +2,6 @@
  * hdffcmd.c: TODO(short description)
  *
  * See the README file for copyright information and how to reach the author.
- *
- * $Id: hdffcmd.c 1.1 2009/12/29 14:30:08 kls Exp $
  */
 
 #include <stdint.h>

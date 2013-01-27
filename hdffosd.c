@@ -2,8 +2,6 @@
  * hdffosd.c: Implementation of the DVB HD Full Featured On Screen Display
  *
  * See the README file for copyright information and how to reach the author.
- *
- * $Id: hdffosd.c 1.1 2009/12/31 14:51:23 kls Exp $
  */
 
 #include "hdffosd.h"
