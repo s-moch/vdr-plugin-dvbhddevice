@@ -25,7 +25,7 @@
 static uchar *YuvToJpeg(uchar *Mem, int Width, int Height, int &Size, int Quality);
 
 
-// --- cDvbHdFfDevice ----------------------------------------------------------
+// --- cDvbHdFfDevice --------------------------------------------------------
 
 int cDvbHdFfDevice::devHdffOffset = -1;
 

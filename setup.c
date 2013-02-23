@@ -434,26 +434,26 @@ void cHdffSetupPage::Store(void)
 
 eOSState cHdffSetupPage::ProcessKey(eKeys key)
 {
-	eOSState state = cMenuSetupPage::ProcessKey(key);
+    eOSState state = cMenuSetupPage::ProcessKey(key);
 
-	if (state == osContinue)
-	{
-		cOsdItem * item;
-		switch (key)
-		{
-			case kLeft:
-			case kRight:
-				item = Get(Current());
-				if (item == mTvFormatItem)
-				{
-				    mVideoConversion = 0;
-					BuildVideoConversionItem();
-					Display();
-				}
-				break;
-			default:
-				break;
-		}
-	}
-	return state;
+    if (state == osContinue)
+    {
+        cOsdItem * item;
+        switch (key)
+        {
+            case kLeft:
+            case kRight:
+                item = Get(Current());
+                if (item == mTvFormatItem)
+                {
+                    mVideoConversion = 0;
+                    BuildVideoConversionItem();
+                    Display();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    return state;
 }

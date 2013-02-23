@@ -102,7 +102,7 @@ install-i18n: $(I18Nmsgs)
 
 $(SOFILE): $(OBJS) libhdffcmd
 	@$(MAKE) --no-print-directory -C libhdffcmd all
-	$(CXX) $(CXXFLAGS) -shared $(OBJS) libhdffcmd/libhdffcmd.a -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) libhdffcmd/libhdffcmd.a -o $@
 
 install-lib: $(SOFILE)
 	install -D $^ $(DESTDIR)$(LIBDIR)/$^.$(APIVERSION)
