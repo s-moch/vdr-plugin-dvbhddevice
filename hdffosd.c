@@ -249,7 +249,6 @@ void cHdffOsd::DrawText(int x, int y, const char *s, tColor ColorFg, tColor Colo
 {
     int w = Font->Width(s);
     int h = Font->Height();
-    int limit = 0;
     int cw = Width ? Width : w;
     int ch = Height ? Height : h;
     int i;
@@ -343,7 +342,6 @@ void cHdffOsd::DrawText(int x, int y, const char *s, tColor ColorFg, tColor Colo
 
     if (Width || Height)
     {
-        limit = x + cw;// - mLeft;
         if (Width)
         {
             if ((Alignment & taLeft) != 0)
