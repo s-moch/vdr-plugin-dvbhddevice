@@ -508,6 +508,8 @@ void cHdffOsd::DrawEllipse(int x1, int y1, int x2, int y2, tColor Color, int Qua
 void cHdffOsd::DrawSlope(int x1, int y1, int x2, int y2, tColor Color, int Type)
 {
     //printf("DrawSlope\n");
+    mHdffCmdIf->CmdOsdDrawSlope(mDisplay, mLeft + x1, mTop + y1,
+                                x2 - x1 + 1, y2 - y1 + 1, Color, Type);
     mChanged = true;
 }
 

@@ -307,6 +307,13 @@ void cHdffCmdIf::CmdOsdDrawEllipse(uint32_t hDisplay, int CX, int CY, int Radius
     HdffCmdOsdDrawEllipse(mOsdDev, hDisplay, CX, CY, RadiusX, RadiusY, Color, Flags);
 }
 
+void cHdffCmdIf::CmdOsdDrawSlope(uint32_t hDisplay, int X, int Y, int Width, int Height,
+                                 uint32_t Color, uint32_t Type)
+{
+    //printf("Slope (%d,%d) %d x %d, %08X, %X\n", X, Y, Width, Height, Color, Type);
+    HdffCmdOsdDrawSlope(mOsdDev, hDisplay, X, Y, Width, Height, Color, Type);
+}
+
 void cHdffCmdIf::CmdOsdDrawText(uint32_t hDisplay, uint32_t hFont, int X, int Y, const char * pText, uint32_t Color)
 {
     //printf("Text %08X (%d,%d), %s, %08X\n", hFont, X, Y, pText, Color);

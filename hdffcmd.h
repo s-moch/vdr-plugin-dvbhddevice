@@ -72,6 +72,7 @@ public:
     void CmdOsdDrawRectangle(uint32_t hDisplay, int X, int Y, int Width, int Height, uint32_t Color);
     void CmdOsdDrawEllipse(uint32_t hDisplay, int CX, int CY, int RadiusX, int RadiusY,
                            uint32_t Color, uint32_t Flags);
+    void CmdOsdDrawSlope(uint32_t hDisplay, int X, int Y, int Width, int Height, uint32_t Color, uint32_t Type);
     void CmdOsdDrawText(uint32_t hDisplay, uint32_t hFont, int X, int Y, const char * pText, uint32_t Color);
     void CmdOsdDrawUtf8Text(uint32_t hDisplay, uint32_t hFont, int X, int Y, const char * pText, uint32_t Color);
     void CmdOsdDrawTextW(uint32_t hDisplay, uint32_t hFont, int X, int Y, const uint16_t * pText, uint32_t Color);
