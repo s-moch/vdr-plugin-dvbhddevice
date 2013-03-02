@@ -561,6 +561,30 @@ int64_t cDvbHdFfDevice::GetSTC(void)
     return -1;
 }
 
+cRect cDvbHdFfDevice::CanScaleVideo(const cRect &Rect, int Alignment)
+{
+    return Rect;
+}
+
+void cDvbHdFfDevice::ScaleVideo(const cRect &Rect)
+{
+    if (Rect == cRect::Null)
+    {
+        mHdffCmdIf->CmdAvSetVideoWindow(0, false, 0, 0, 0, 0);
+    }
+    else
+    {
+        int osdWidth;
+        int osdHeight;
+        double osdPixelAspect;
+
+        GetOsdSize(osdWidth, osdHeight, osdPixelAspect);
+        mHdffCmdIf->CmdAvSetVideoWindow(0, true,
+            Rect.X() * 1000 / osdWidth, Rect.Y() * 1000 / osdHeight,
+            Rect.Width() * 1000 / osdWidth, Rect.Height() * 1000 / osdHeight);
+    }
+}
+
 void cDvbHdFfDevice::TrickSpeed(int Speed)
 {
   freezed = false;

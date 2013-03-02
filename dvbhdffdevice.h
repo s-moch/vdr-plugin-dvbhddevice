@@ -97,6 +97,8 @@ protected:
   virtual int PlayTsAudio(const uchar *Data, int Length);
 public:
   virtual int64_t GetSTC(void);
+  virtual cRect CanScaleVideo(const cRect &Rect, int Alignment = taCenter);
+  virtual void ScaleVideo(const cRect &Rect = cRect::Null);
   virtual void TrickSpeed(int Speed);
   virtual void Clear(void);
   virtual void Play(void);
