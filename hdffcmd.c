@@ -173,6 +173,10 @@ void cHdffCmdIf::CmdAvSetSyncShift(int16_t SyncShift)
     HdffCmdAvSetSyncShift(mOsdDev, SyncShift);
 }
 
+void cHdffCmdIf::CmdAvMuteAudio(uint8_t DecoderIndex, bool Mute)
+{
+    HdffCmdAvMuteAudio(mOsdDev, DecoderIndex, Mute);
+}
 
 void cHdffCmdIf::CmdOsdConfigure(const HdffOsdConfig_t * pConfig)
 {

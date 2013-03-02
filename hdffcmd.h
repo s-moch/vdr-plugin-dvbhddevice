@@ -46,6 +46,7 @@ public:
     void CmdAvSetAudioDownmix(HdffAudioDownmixMode_t DownmixMode);
     void CmdAvSetAudioChannel(uint8_t AudioChannel);
     void CmdAvSetSyncShift(int16_t SyncShift);
+    void CmdAvMuteAudio(uint8_t DecoderIndex, bool Mute);
 
     void CmdOsdConfigure(const HdffOsdConfig_t * pConfig);
     void CmdOsdReset(void);

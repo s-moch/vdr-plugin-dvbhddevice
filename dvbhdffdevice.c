@@ -496,6 +496,7 @@ bool cDvbHdFfDevice::SetPlayMode(ePlayMode PlayMode)
         mHdffCmdIf->CmdAvSetDecoderInput(0, 0);
         mHdffCmdIf->CmdAvEnableSync(0, true);
         mHdffCmdIf->CmdAvSetPlayMode(0, true);
+        mHdffCmdIf->CmdAvMuteAudio(0, false);
     }
     else {
         if (playMode == pmNone)
@@ -589,6 +590,7 @@ void cDvbHdFfDevice::Play(void)
         mHdffCmdIf->CmdAvEnableSync(0, true);
     mHdffCmdIf->CmdAvSetVideoSpeed(0, 100);
     mHdffCmdIf->CmdAvSetAudioSpeed(0, 100);
+    mHdffCmdIf->CmdAvMuteAudio(0, false);
     cDevice::Play();
 }
 
@@ -602,8 +604,8 @@ void cDvbHdFfDevice::Freeze(void)
 
 void cDvbHdFfDevice::Mute(void)
 {
-  //TODO???
-  cDevice::Mute();
+    mHdffCmdIf->CmdAvMuteAudio(0, true);
+    cDevice::Mute();
 }
 
 static HdffVideoStreamType_t MapVideoStreamTypes(int Vtype)
