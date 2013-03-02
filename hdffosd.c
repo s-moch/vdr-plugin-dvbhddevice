@@ -105,6 +105,10 @@ cHdffOsd::cHdffOsd(int Left, int Top, HDFF::cHdffCmdIf * pHdffCmdIf, uint Level)
 cHdffOsd::~cHdffOsd()
 {
     //printf("~cHdffOsd %d %d\n", mLeft, mTop);
+    if (Active()) {
+        mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
+        mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
+    }
     SetActive(false);
 
     for (int i = 0; i < MAX_NUM_FONTS; i++)
@@ -122,8 +126,6 @@ cHdffOsd::~cHdffOsd()
 
     if (mBitmapPalette != HDFF_INVALID_HANDLE)
         mHdffCmdIf->CmdOsdDeletePalette(mBitmapPalette);
-    mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
-    mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
     mHdffCmdIf->CmdOsdDeleteDisplay(mDisplay);
 }
 
@@ -150,7 +152,7 @@ eOsdError cHdffOsd::SetAreas(const tArea *Areas, int NumAreas)
     {
         //printf("SetAreas %d: %d %d %d %d %d\n", i, Areas[i].x1, Areas[i].y1, Areas[i].x2, Areas[i].y2, Areas[i].bpp);
     }
-    if (mDisplay != HDFF_INVALID_HANDLE)
+    if (Active() && mDisplay != HDFF_INVALID_HANDLE)
     {
         mHdffCmdIf->CmdOsdDrawRectangle(mDisplay, 0, 0, mDispWidth, mDispHeight, 0);
         mHdffCmdIf->CmdOsdRenderDisplay(mDisplay);
