@@ -25,6 +25,9 @@ msgstr "Bildanpassung"
 msgid "TV on"
 msgstr "TV ein"
 
+msgid "TV off"
+msgstr "TV aus"
+
 msgid "Automatic"
 msgstr "automatisch"
 
