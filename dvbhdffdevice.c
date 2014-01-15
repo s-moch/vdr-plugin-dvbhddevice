@@ -614,7 +614,11 @@ void cDvbHdFfDevice::ScaleVideo(const cRect &Rect)
     }
 }
 
+#if (APIVERSNUM >= 20103)
+void cDvbHdFfDevice::TrickSpeed(int Speed, bool Forward)
+#else
 void cDvbHdFfDevice::TrickSpeed(int Speed)
+#endif
 {
   freezed = false;
   mHdffCmdIf->CmdAvEnableSync(0, false);
