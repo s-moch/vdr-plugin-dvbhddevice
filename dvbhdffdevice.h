@@ -77,9 +77,12 @@ protected:
 private:
   int playVideoPid;
   int playAudioPid;
+  int playPcrPid;
   bool freezed;
   bool trickMode;
   bool isPlayingVideo;
+  bool isTransferMode;
+  bool supportsPcrInTransferMode;
 
   // Pes2Ts conversion stuff
   uint8_t videoCounter;
