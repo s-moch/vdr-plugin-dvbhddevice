@@ -33,6 +33,7 @@ cHdffSetup::cHdffSetup(void)
     RemoteAddress = -1;
     HighLevelOsd = 1;
     TrueColorOsd = 1;
+    TrueColorFormat = 0;
     HideMainMenu = 0;
 }
 
@@ -54,6 +55,7 @@ bool cHdffSetup::SetupParse(const char *Name, const char *Value)
     else if (strcmp(Name, "RemoteAddress")     == 0) RemoteAddress     = atoi(Value);
     else if (strcmp(Name, "HighLevelOsd")      == 0) HighLevelOsd      = atoi(Value);
     else if (strcmp(Name, "TrueColorOsd")      == 0) TrueColorOsd      = atoi(Value);
+    else if (strcmp(Name, "TrueColorFormat")   == 0) TrueColorFormat   = atoi(Value);
     else if (strcmp(Name, "HideMainMenu")      == 0) HideMainMenu      = atoi(Value);
     else return false;
     return true;
@@ -190,6 +192,7 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     const int kAudioDownmixes = 5;
     const int kOsdSizes = 5;
     const int kRemoteProtocols = 3;
+    const int kTrueColorFormats = 3;
 
     static const char * ResolutionItems[kResolutions] =
     {
@@ -246,6 +249,13 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
         "RC6",
     };
 
+    static const char * TrueColorFormatItems[kTrueColorFormats] =
+    {
+        "ARGB8888",
+        "ARGB8565",
+        "ARGB4444",
+    };
+
     mHdffCmdIf = pHdffCmdIf;
     mNewHdffSetup = gHdffSetup;
 
@@ -265,6 +275,7 @@ cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
     Add(new cMenuEditIntItem(tr("Remote Control Address"), &mNewHdffSetup.RemoteAddress, -1, 31));
     Add(new cMenuEditBoolItem(tr("High Level OSD"), &mNewHdffSetup.HighLevelOsd));
     Add(new cMenuEditBoolItem(tr("Allow True Color OSD"), &mNewHdffSetup.TrueColorOsd));
+    Add(new cMenuEditStraItem(tr("True Color format"), &mNewHdffSetup.TrueColorFormat, kTrueColorFormats, TrueColorFormatItems));
     Add(new cMenuEditBoolItem(tr("Hide mainmenu entry"), &mNewHdffSetup.HideMainMenu));
 
     mVideoConversion = 0;
@@ -395,6 +406,7 @@ void cHdffSetupPage::Store(void)
     SetupStore("RemoteAddress", mNewHdffSetup.RemoteAddress);
     SetupStore("HighLevelOsd", mNewHdffSetup.HighLevelOsd);
     SetupStore("TrueColorOsd", mNewHdffSetup.TrueColorOsd);
+    SetupStore("TrueColorFormat", mNewHdffSetup.TrueColorFormat);
     SetupStore("HideMainMenu", mNewHdffSetup.HideMainMenu);
 
     if (mHdffCmdIf)

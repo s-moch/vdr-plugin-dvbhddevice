@@ -36,6 +36,7 @@ struct cHdffSetup
 
     int HighLevelOsd;
     int TrueColorOsd;
+    int TrueColorFormat;
 
     int HideMainMenu;
 };
