@@ -795,6 +795,11 @@ int cDvbHdFfDevice::PlayVideo(const uchar *Data, int Length)
         mHdffCmdIf->CmdAvEnableSync(0, true);
         isPlayingVideo = true;
     }
+
+    // ignore padding PES packets
+    if (Data[3] == 0xBE)
+        return Length;
+
     //TODO: support greater Length
     uint8_t tsBuffer[188 * 16];
     uint32_t tsLength;
