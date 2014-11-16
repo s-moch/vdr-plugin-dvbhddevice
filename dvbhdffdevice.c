@@ -238,6 +238,26 @@ uchar *cDvbHdFfDevice::GrabImage(int &Size, bool Jpeg, int Quality, int SizeX, i
     return result;
 }
 
+void cDvbHdFfDevice::SetVideoDisplayFormat(eVideoDisplayFormat VideoDisplayFormat)
+{
+    if (gHdffSetup.TvFormat == HDFF_TV_FORMAT_4_BY_3)
+    {
+        switch (VideoDisplayFormat)
+        {
+            case vdfPanAndScan:
+            case vdfCenterCutOut:
+                gHdffSetup.VideoConversion = HDFF_VIDEO_CONVERSION_CENTRE_CUT_OUT;
+                break;
+
+            case vdfLetterBox:
+                gHdffSetup.VideoConversion = HDFF_VIDEO_CONVERSION_LETTERBOX_16_BY_9;
+                break;
+        }
+        gHdffSetup.SetVideoFormat(mHdffCmdIf);
+    }
+    cDevice::SetVideoDisplayFormat(VideoDisplayFormat);
+}
+
 void cDvbHdFfDevice::GetVideoSize(int &Width, int &Height, double &VideoAspect)
 {
   if (fd_video >= 0) {
