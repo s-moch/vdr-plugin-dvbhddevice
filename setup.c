@@ -182,6 +182,16 @@ const char * cHdffSetup::GetVideoConversionString(void)
     }
 }
 
+void cHdffSetup::SetVideoFormat(HDFF::cHdffCmdIf * HdffCmdIf)
+{
+    HdffVideoFormat_t videoFormat;
+
+    videoFormat.AutomaticEnabled = true;
+    videoFormat.AfdEnabled = false;
+    videoFormat.TvFormat = (HdffTvFormat_t) TvFormat;
+    videoFormat.VideoConversion = (HdffVideoConversion_t) VideoConversion;
+    HdffCmdIf->CmdAvSetVideoFormat(0, &videoFormat);
+}
 
 cHdffSetupPage::cHdffSetupPage(HDFF::cHdffCmdIf * pHdffCmdIf)
 {
@@ -415,14 +425,9 @@ void cHdffSetupPage::Store(void)
         {
             mHdffCmdIf->CmdHdmiSetVideoMode(mNewHdffSetup.GetVideoMode());
         }
-        HdffVideoFormat_t videoFormat;
         HdffHdmiConfig_t hdmiConfig;
 
-        videoFormat.AutomaticEnabled = true;
-        videoFormat.AfdEnabled = false;
-        videoFormat.TvFormat = (HdffTvFormat_t) mNewHdffSetup.TvFormat;
-        videoFormat.VideoConversion = (HdffVideoConversion_t) mNewHdffSetup.VideoConversion;
-        mHdffCmdIf->CmdAvSetVideoFormat(0, &videoFormat);
+        mNewHdffSetup.SetVideoFormat(mHdffCmdIf);
 
         mHdffCmdIf->CmdAvSetAudioDelay(mNewHdffSetup.AudioDelay);
         mHdffCmdIf->CmdAvSetAudioDownmix((HdffAudioDownmixMode_t) mNewHdffSetup.AudioDownmix);

@@ -108,17 +108,12 @@ cDvbHdFfDevice::~cDvbHdFfDevice()
 
 void cDvbHdFfDevice::MakePrimaryDevice(bool On)
 {
-  if (On) {
-     new cHdffOsdProvider(mHdffCmdIf);
-     //TODO the same code is also used in cHdffSetupPage::Store() and cHdffMenu::SetVideoConversion() - combine?
-     HdffVideoFormat_t videoFormat;
-     videoFormat.AutomaticEnabled = true;
-     videoFormat.AfdEnabled = false;
-     videoFormat.TvFormat = (HdffTvFormat_t) gHdffSetup.TvFormat;
-     videoFormat.VideoConversion = (HdffVideoConversion_t) gHdffSetup.VideoConversion;
-     mHdffCmdIf->CmdAvSetVideoFormat(0, &videoFormat);
-     }
-  cDvbDevice::MakePrimaryDevice(On);
+    if (On) {
+        new cHdffOsdProvider(mHdffCmdIf);
+
+        gHdffSetup.SetVideoFormat(mHdffCmdIf);
+    }
+    cDvbDevice::MakePrimaryDevice(On);
 }
 
 bool cDvbHdFfDevice::HasDecoder(void) const
