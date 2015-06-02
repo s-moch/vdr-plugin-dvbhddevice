@@ -681,7 +681,11 @@ void cHdffOsdRaw::Flush(void)
                 return;
         }
         LOCK_PIXMAPS;
+#if (APIVERSNUM >= 20110)
+        while (cPixmapMemory *pm = dynamic_cast<cPixmapMemory *>(RenderPixmaps()))
+#else
         while (cPixmapMemory *pm = RenderPixmaps())
+#endif
         {
             int w = pm->ViewPort().Width();
             int h = pm->ViewPort().Height();
@@ -736,7 +740,11 @@ void cHdffOsdRaw::Flush(void)
                         HDFF_COLOR_TYPE_ARGB4444, HDFF_INVALID_HANDLE);
                 }
             }
+#if (APIVERSNUM >= 20110)
+            DestroyPixmap(pm);
+#else
             delete pm;
+#endif
             render = true;
         }
         if (buffer)
