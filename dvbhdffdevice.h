@@ -16,11 +16,12 @@
 class cDvbHdFfDevice : public cDvbDevice {
 private:
   int fd_osd, fd_audio, fd_video;
+  bool outputOnly;
 protected:
   virtual void MakePrimaryDevice(bool On);
 public:
   static bool Probe(int Adapter, int Frontend);
-  cDvbHdFfDevice(int Adapter, int Frontend);
+  cDvbHdFfDevice(int Adapter, int Frontend, bool OutputOnly);
   virtual ~cDvbHdFfDevice();
   virtual bool HasDecoder(void) const;
 
@@ -33,6 +34,9 @@ public:
 
 // Channel facilities
 
+public:
+  virtual bool ProvidesSource(int Source) const;
+  virtual int NumProvidedSystems(void) const;
 private:
   void TurnOffLiveMode(bool LiveView);
 protected:
@@ -123,8 +127,12 @@ private:
 };
 
 class cDvbHdFfDeviceProbe : public cDvbDeviceProbe {
+private:
+  bool outputOnly;
 public:
+  cDvbHdFfDeviceProbe(void);
   virtual bool Probe(int Adapter, int Frontend);
+  void SetOutputOnly(bool On) { outputOnly = On; }
   };
 
 #endif //__DVBHDFFDEVICE_H

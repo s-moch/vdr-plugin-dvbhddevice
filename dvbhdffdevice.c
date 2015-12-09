@@ -29,13 +29,19 @@ static uchar *YuvToJpeg(uchar *Mem, int Width, int Height, int &Size, int Qualit
 
 int cDvbHdFfDevice::devHdffOffset = -1;
 
-cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend)
+cDvbHdFfDevice::cDvbHdFfDevice(int Adapter, int Frontend, bool OutputOnly)
 :cDvbDevice(Adapter, Frontend)
 {
   spuDecoder = NULL;
   audioChannel = 0;
   playMode = pmNone;
   mHdffCmdIf = NULL;
+  outputOnly = OutputOnly;
+
+  if (outputOnly) {
+     StopSectionHandler();
+     // cannot close fd_tuner, fd_ca and delete ciAdapter, dvbTuner here - are cDvbDevice private
+  }
 
   // Devices that are only present on cards with decoders:
 
@@ -350,6 +356,20 @@ bool cDvbHdFfDevice::SetPid(cPidHandle *Handle, int Type, bool On)
         }
     }
     return true;
+}
+
+bool cDvbHdFfDevice::ProvidesSource(int Source) const
+{
+  if (outputOnly)
+     return false;
+  return cDvbDevice::ProvidesSource(Source);
+}
+
+int cDvbHdFfDevice::NumProvidedSystems(void) const
+{
+  if (outputOnly)
+     return 0;
+  return cDvbDevice::NumProvidedSystems();
 }
 
 void cDvbHdFfDevice::TurnOffLiveMode(bool LiveView)
@@ -964,6 +984,11 @@ HDFF::cHdffCmdIf *cDvbHdFfDevice::GetHdffCmdHandler(void)
 
 // --- cDvbHdFfDeviceProbe ---------------------------------------------------
 
+cDvbHdFfDeviceProbe::cDvbHdFfDeviceProbe(void)
+{
+  outputOnly = false;
+}
+
 bool cDvbHdFfDeviceProbe::Probe(int Adapter, int Frontend)
 {
   static uint32_t SubsystemIds[] = {
@@ -993,8 +1018,12 @@ bool cDvbHdFfDeviceProbe::Probe(int Adapter, int Frontend)
          int fd = open(FileName, O_RDWR);
          if (fd != -1) { //TODO treat the second path of the S2-6400 as a budget device
             close(fd);
-            dsyslog("creating cDvbHdFfDevice");
-            new cDvbHdFfDevice(Adapter, Frontend);
+            dsyslog("creating cDvbHdFfDevice%s", outputOnly ? " (output only)" : "");
+            new cDvbHdFfDevice(Adapter, Frontend, outputOnly);
+            return true;
+            }
+         else if (outputOnly) {
+            dsyslog("cDvbHdFfDevice 2nd tuner disabled (outputonly)");
             return true;
             }
          }

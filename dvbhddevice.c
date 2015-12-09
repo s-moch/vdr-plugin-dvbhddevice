@@ -4,6 +4,7 @@
  * See the README file for copyright information and how to reach the author.
  */
 
+#include <getopt.h>
 #include <vdr/plugin.h>
 #include <vdr/shutdown.h>
 #include "dvbhdffdevice.h"
@@ -29,6 +30,8 @@ public:
   virtual cOsdObject *MainMenuAction(void);
   virtual cMenuSetupPage *SetupMenu(void);
   virtual bool SetupParse(const char *Name, const char *Value);
+  virtual const char *CommandLineHelp(void);
+  virtual bool ProcessArgs(int argc, char *argv[]);
   };
 
 cPluginDvbhddevice::cPluginDvbhddevice(void)
@@ -40,6 +43,29 @@ cPluginDvbhddevice::cPluginDvbhddevice(void)
 cPluginDvbhddevice::~cPluginDvbhddevice()
 {
   delete probe;
+}
+
+const char *cPluginDvbhddevice::CommandLineHelp(void)
+{
+  return "  -o        --outputonly   do not receive, just use as output device\n";
+}
+
+bool cPluginDvbhddevice::ProcessArgs(int argc, char *argv[])
+{
+  static struct option long_options[] = {
+       { "outputonly", no_argument, NULL, 'o' },
+       { NULL,         no_argument, NULL,  0  }
+     };
+
+  int c;
+  while ((c = getopt_long(argc, argv, "o", long_options, NULL)) != -1) {
+        switch (c) {
+          case 'o': probe->SetOutputOnly(true);
+                    break;
+          default:  return false;
+          }
+        }
+  return true;
 }
 
 void cPluginDvbhddevice::MainThreadHook(void)
