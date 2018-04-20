@@ -461,7 +461,12 @@ void cDvbHdFfDevice::SetAudioTrackDevice(eTrackType Type)
     const tTrackId *TrackId = GetTrack(Type);
     if (TrackId && TrackId->id) {
         int streamType = 0;
+#if (APIVERSNUM >= 20301)
+        LOCK_CHANNELS_READ;
+        const cChannel * channel = Channels->GetByNumber(CurrentChannel());
+#else
         cChannel * channel = Channels.GetByNumber(CurrentChannel());
+#endif
         if (channel) {
             if (IS_AUDIO_TRACK(Type))
                 streamType = channel->Atype(Type - ttAudioFirst);
