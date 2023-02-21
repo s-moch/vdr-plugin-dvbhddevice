@@ -11,6 +11,11 @@
 #include <vdr/dvbdevice.h>
 #include <vdr/dvbspu.h>
 
+// AUDIO_GET_PTS was dropped from the kernel!
+#ifndef AUDIO_GET_PTS
+  #define AUDIO_GET_PTS _IOR('o', 19, __u64)
+#endif
+
 /// The cDvbHdFfDevice implements a DVB device which can be accessed through the Linux DVB driver API.
 
 class cDvbHdFfDevice : public cDvbDevice {
